@@ -1,5 +1,6 @@
 package com.budgie.server.entity;
 
+import com.budgie.server.enums.IsVerified;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,6 +36,9 @@ public class EmailVerificationEntity {
 
     @Column(name="expiration_time")
     private Instant expirationTime;
+
+    @Enumerated(EnumType.STRING)
+    private IsVerified isVerified;
 
     @CreationTimestamp
     @Column(name="created_at", nullable = false)

@@ -3,6 +3,7 @@ package com.budgie.server.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +25,7 @@ public class EmailService {
     private String fromEmail;
 
     //메일로 인증번호 보내기
-    private MimeMessage createMessage(String to, String number) throws MessagingException, UnsupportedOperationException{
+    private MimeMessage createMessage(String to, String number) throws MessagingException {
         log.info("보내는 대상 : " + to);
         log.info("인증 번호 : " + number);
 
@@ -95,6 +96,21 @@ public class EmailService {
                 .map(String::valueOf)
                 .collect(Collectors.joining());
         return code;
+    }
+
+    //이메일 전송
+    public void sendVerificationEmail(String toEmail, String verificationCode) {
+        try {
+            // 1. HTML 메일 메시지 생성
+            MimeMessage message = createMessage(toEmail, verificationCode);
+
+            // 2. 메일 전송
+            mailSender.send(message);
+        } catch (MessagingException  e) {
+            log.error("인증 이메일 전송 중 오류 발생: {}", e.getMessage());
+            // 예외 처리 로직 추가 (예: RuntimeException throw)
+            throw new RuntimeException("이메일 전송 실패", e);
+        }
     }
 
     //임시 비밀번호 생성
