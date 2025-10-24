@@ -12,4 +12,7 @@ public interface AuthRepository extends JpaRepository<UserEntity, Long> {
     @Query("select user from UserEntity user where user.email = :email and user.deletedAt is null")
     Optional<UserEntity> findByEmail(String email);
     Boolean existsByEmail(String email); //이메일 중복 확인
+
+    @Query("select user from UserEntity user where user.email = :email")
+    Optional<UserEntity> findByEmailWithDeleted(String email);
 }

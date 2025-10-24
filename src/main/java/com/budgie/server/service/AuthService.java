@@ -5,12 +5,20 @@ import com.budgie.server.dto.UserSignupRequestDto;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.enums.UserStatus;
 import com.budgie.server.repository.AuthRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.management.relation.RelationNotFoundException;
+import javax.naming.AuthenticationException;
+import javax.swing.text.html.Option;
+import java.security.SecureRandom;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -66,6 +74,23 @@ public class AuthService {
         }
 
         //삭제된 계정 포함한 이메일 조회
+        Optional<UserEntity> existingUserOptional = authRepository.findByEmailWithDeleted(email);
+        if(existingUserOptional.isPresent()){
+            UserEntity existingUser = existingUserOptional.get();
+
+            //계정 활성화
+            if(existingUser.getUserStatus() == UserStatus.Y && existingUser.getDeletedAt() == null){
+                log.warn("이미 사용 중인 이메일 : {}", email);
+                throw new RuntimeException("이미 사용 중인 이메일");
+            }else{
+                existingUser.setDeletedAt(null);
+                existingUser.setUserStatus(UserStatus.Y);
+                existingUser.setNickname(nickname);
+                existingUser.setPassword(passwordEncoder.encode(password));
+
+                return authRepository.save(existingUser);
+            }
+        }
 
         UserEntity newUser = UserEntity.builder()
                 .email(email)
@@ -74,6 +99,65 @@ public class AuthService {
                 .password(passwordEncoder.encode(password))
                 .build();
         return authRepository.save(newUser);
+    }
+
+    //로그인 검사
+    public UserEntity findByEmailAndPassword(final String email, String password){
+        final Optional<UserEntity> userOptional = authRepository.findByEmail(email);
+        final UserEntity originalUSer = userOptional.orElse(null);
+
+        //사용자 존재여부 확인
+        if(originalUSer == null){
+            log.warn("유저를 찾을 수 없습니다.:{}",email);
+            return null;
+        }
+
+        if(originalUSer.getDeletedAt() != null || originalUSer.getUserStatus() == UserStatus.N){
+            throw new EntityNotFoundException("탈퇴된 계정입니다. 재가입이 필요합니다.");
+        }
+
+        //비밀번호 일치
+        if(passwordEncoder.matches(password, originalUSer.getPassword())){
+            return originalUSer;
+        }
+        log.warn("비밀번호가 이메일과 일치하지 않음 : {} ", email);
+        return null;
+    }
+
+    public UserEntity getById(final Long id){
+        Optional<UserEntity> userOptional = authRepository.findById(id);
+        return userOptional.orElse(null);
+    }
+
+    public Optional<UserEntity> findByEmail(String email){
+        return authRepository.findByEmail(email);
+    }
+
+    //로그인 검증 로직
+    public AuthResponseDto login(String email, String password){
+        //사용자 인증
+        UserEntity loginUser= findByEmail(email)
+                .orElseThrow(()->new RuntimeException("이메일, 비밀번호가 일치하지 않습니다."));
+
+        //비번
+        if(!passwordEncoder.matches(password, loginUser.getPassword())){
+            throw new RuntimeException("이메일, 비밀번호를 확인해주세요.");
+        }
+
+        //토큰 생성
+        String accessToken = jwt
+    }
+
+    @Transactional
+    public UserEntity findOrCreateUser(String email, String nickname){
+        return authRepository.findByEmail(email).orElseGet(()->{
+            UserEntity newUser = UserEntity.builder()
+                    .email(email)
+                    .nickname(nickname)
+                    .password(passwordEncoder.encode(UUID.randomUUID().toString()))//더미 비번
+                    .build();
+            return authRepository.save(newUser);
+        });
     }
 
 }
