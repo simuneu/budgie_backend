@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class JwtProvider {
     private final UserDetailsService userDetailsService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Value("${jwt.secret.key}") //application.properties
     private String SECRET_KEY;
@@ -113,7 +114,7 @@ public class JwtProvider {
         return validateAndGetUserId(token) != null;
     }
 
-    //토큰에서 userId푸풀 후 객체 생성
+    //토큰에서 userId추출 후 객체 생성
     public Authentication getAuthentication(String token){
         Claims claims = getParser()
                 .parseSignedClaims(token)

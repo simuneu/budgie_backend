@@ -5,6 +5,7 @@ import com.budgie.server.dto.UserSignupRequestDto;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.enums.UserStatus;
 import com.budgie.server.repository.AuthRepository;
+import com.budgie.server.security.JwtProvider;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +18,7 @@ import javax.management.relation.RelationNotFoundException;
 import javax.naming.AuthenticationException;
 import javax.swing.text.html.Option;
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,13 +30,16 @@ public class AuthService {
     private final AuthRepository authRepository;
     private final EmailService emailService;
     private final EmailVerificationService emailVerificationService;
+    private final JwtProvider jwtProvider;
 
-    public AuthService(PasswordEncoder passwordEncoder, AuthRepository authRepository
-                            , EmailService emailService, EmailVerificationService emailVerificationService){
+    public AuthService(PasswordEncoder passwordEncoder, AuthRepository authRepository,
+                       EmailService emailService, EmailVerificationService emailVerificationService,
+                       JwtProvider jwtProvider){
         this.passwordEncoder = passwordEncoder;
         this.authRepository = authRepository;
         this.emailService = emailService;
         this.emailVerificationService = emailVerificationService;
+        this.jwtProvider = jwtProvider;
     }
     //패스워드
     private static final String PASSWORD_REGEX =
@@ -144,8 +149,11 @@ public class AuthService {
             throw new RuntimeException("이메일, 비밀번호를 확인해주세요.");
         }
 
-        //토큰 생성
-        String accessToken = jwt
+        //로그인 시 토큰 생성
+        String accessToken = jwtProvider.createAccessToken(loginUser.getUserId());
+        String refreshToken = jwtProvider.createRefreshToken(loginUser.getUserId());
+
+        Instant expiryDate = jwtProvider.getRefreshTokenExpirationDate();
     }
 
     @Transactional
