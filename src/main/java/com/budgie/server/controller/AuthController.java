@@ -54,7 +54,7 @@ public class AuthController {
         }
     }
 
-    //로그아웃
+    //로그아웃 - Security Context추출로 변경 필요+LogoutRequestDto
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser(@RequestBody Long userId){
         try{
@@ -70,6 +70,23 @@ public class AuthController {
                     .error("로그아웃 처리 실패: " + e.getMessage())
                     .build();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDto);
+        }
+    }
+
+    //토큰 갱신 - RefreshTokenRequestDto가
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshAccessToken(@RequestBody String refreshToken){
+        try{
+            log.info("access token 갱신 요청 수신");
+            AuthResponseDto responseDto = authService.refreshAccessToken(refreshToken);
+            return ResponseEntity.ok().body(responseDto);
+        } catch (RuntimeException e) {
+            log.error("토큰 갱신 실패"+e.getMessage());
+            ResponseDto responseDto = ResponseDto.builder()
+                    .error("토큰 갱신 실패"+e.getMessage())
+                    .build();
+            //401/403
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseDto);
         }
     }
 }
