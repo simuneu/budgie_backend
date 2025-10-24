@@ -31,15 +31,17 @@ public class AuthService {
     private final EmailService emailService;
     private final EmailVerificationService emailVerificationService;
     private final JwtProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
 
     public AuthService(PasswordEncoder passwordEncoder, AuthRepository authRepository,
                        EmailService emailService, EmailVerificationService emailVerificationService,
-                       JwtProvider jwtProvider){
+                       JwtProvider jwtProvider, RefreshTokenService refreshTokenService){
         this.passwordEncoder = passwordEncoder;
         this.authRepository = authRepository;
         this.emailService = emailService;
         this.emailVerificationService = emailVerificationService;
         this.jwtProvider = jwtProvider;
+        this.refreshTokenService = refreshTokenService;
     }
     //패스워드
     private static final String PASSWORD_REGEX =
@@ -153,7 +155,13 @@ public class AuthService {
         String accessToken = jwtProvider.createAccessToken(loginUser.getUserId());
         String refreshToken = jwtProvider.createRefreshToken(loginUser.getUserId());
 
-        Instant expiryDate = jwtProvider.getRefreshTokenExpirationDate();
+        refreshTokenService.saveRefreshToken(loginUser.getUserId(), refreshToken);
+
+        return AuthResponseDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .grantType(jwtProvider.getGrantType())
+                .build();
     }
 
     @Transactional

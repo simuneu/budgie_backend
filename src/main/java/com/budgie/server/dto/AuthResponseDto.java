@@ -10,7 +10,7 @@ public class AuthResponseDto {
     private String nickname;
 
     private String accessToken;
-    private String refreshToke;
+    private String refreshToken;
     private String grantType;
     private Long accessTokenExpiresIn;
 }

@@ -37,6 +37,24 @@ public class RefreshTokenService {
         return redisTemplate.opsForValue().get(key);
     }
 
+    //RTR핵심 검증
+    public boolean validateRefreshToken(Long userId, String clientRefreshToken){
+        String key = KEY_PREFIX + userId;
+        String storedToken = redisTemplate.opsForValue().get(key);
+
+        if(storedToken == null){
+            log.warn("refresh token 검증 실패, redis에 토큰이 없음. userId:{}", userId);
+            return false;
+        }
+        if(storedToken.equals(clientRefreshToken)){
+            return true;
+        }else{
+            deletedRefreshToken(userId);
+            log.error("refresh token 검증 실패, 토큰 불일치+기존 토큰 무효화:{}", userId);
+            return false;
+        }
+    }
+
     //리프레시 토큰을 삭제->무효화
     public boolean deletedRefreshToken(Long userId){
         String key = KEY_PREFIX + userId;

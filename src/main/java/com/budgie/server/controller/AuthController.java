@@ -1,10 +1,10 @@
 package com.budgie.server.controller;
 
 import com.budgie.server.dto.AuthResponseDto;
+import com.budgie.server.dto.ResponseDto;
 import com.budgie.server.dto.UserDto;
 import com.budgie.server.dto.UserSignupRequestDto;
 import com.budgie.server.entity.UserEntity;
-import com.budgie.server.repository.AuthRepository;
 import com.budgie.server.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,12 +39,16 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/signin")
-    public ResponseEntity<?> signin(@RequestBody UserDto userDto){
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody UserDto userDto){
         try{
-            AuthResponseDto responseDto   = authService.login
+            AuthResponseDto responseDto   = authService.login(userDto.getEmail(), userDto.getPassword());
+            return ResponseEntity.ok().body(responseDto);
         }catch (Exception e){
-
+            ResponseDto responseDto = ResponseDto.builder()
+                    .error("로그인 실패, 이메일과 비밀번호를 다시 확인")
+                    .build();
+            return ResponseEntity.status(401).body(responseDto);
         }
     }
 }

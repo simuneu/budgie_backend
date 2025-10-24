@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,7 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class JwtProvider {
     private final UserDetailsService userDetailsService;
-    private final RefreshTokenRepository refreshTokenRepository;
 
     @Value("${jwt.secret.key}") //application.properties
     private String SECRET_KEY;
@@ -88,6 +89,11 @@ public class JwtProvider {
        }
     }
 
+    //refresh token만료 시간
+    public Instant getRefreshTokenExpiryDate(){
+        return Instant.now().plus(REFRESH_EXPIRATION_TIME, ChronoUnit.MILLIS);
+    }
+
     //jwt 토큰 검증, 사용자 id추출
     public String validateAndGetUserId(String token){
         try{
@@ -109,7 +115,7 @@ public class JwtProvider {
         return null;
     }
 
-    //토큰 유효성 검증
+    //토큰 유효성 검증(서명/만료)
     public boolean validateToken(String token){
         return validateAndGetUserId(token) != null;
     }
