@@ -164,6 +164,7 @@ public class AuthService {
                 .build();
     }
 
+    //유저 조회, 생성
     @Transactional
     public UserEntity findOrCreateUser(String email, String nickname){
         return authRepository.findByEmail(email).orElseGet(()->{
@@ -174,6 +175,47 @@ public class AuthService {
                     .build();
             return authRepository.save(newUser);
         });
+    }
+
+    //토큰 무효화
+    @Transactional
+    public void logout(Long userId){
+        if(refreshTokenService.deletedRefreshToken(userId)){
+            log.info("로그아웃 성공, refresh token 삭제 완료. userId:{}", userId);
+        }else{
+            log.warn("로그아웃 실패:refresh token이 존재하지 않거나 삭제 오류:{}", userId);
+        }
+    }
+
+    //RTR
+    @Transactional
+    public AuthResponseDto refreshAccessToken(String refreshToken){
+        //jwt자체 유효성 검사
+        if(jwtProvider.validateToken(refreshToken)== false){
+            throw new RuntimeException("유효하지 않거나 만료된 token");
+        }
+        //토큰에서 userId추출
+        Long userId = jwtProvider.getUserIdFromToken(refreshToken);
+
+        //redis token과 일치하는지 검즏(rtr보안)
+        if(!refreshTokenService.validateRefreshToken(userId, refreshToken)){
+            throw new RuntimeException("유효하지 않은 refresh token");
+        }
+
+        //검증 성공 시
+        //기존 토큰 삭제
+        refreshTokenService.deletedRefreshToken(userId);
+        //새 토큰 발급
+        String newAccessToken = jwtProvider.createAccessToken(userId);
+        String newRefreshToken = jwtProvider.createRefreshToken(userId);
+        //새 토큰 redis에 저장
+        refreshTokenService.saveRefreshToken(userId, newRefreshToken);
+        //새 토큰 반환
+        return AuthResponseDto.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .grantType(jwtProvider.getGrantType())
+                .build();
     }
 
 }
