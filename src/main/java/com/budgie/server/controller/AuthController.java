@@ -3,6 +3,7 @@ package com.budgie.server.controller;
 import com.budgie.server.dto.*;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,13 +39,13 @@ public class AuthController {
 
     //로그인
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody UserDto userDto){
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto requestDto){
         try{
-            AuthResponseDto responseDto   = authService.login(userDto.getEmail(), userDto.getPassword());
+            AuthResponseDto responseDto   = authService.login(requestDto);
             return ResponseEntity.ok().body(responseDto);
         }catch (Exception e){
             ResponseDto responseDto = ResponseDto.builder()
-                    .error("로그인 실패, 이메일과 비밀번호를 다시 확인")
+                    .error(e.getMessage())
                     .build();
             return ResponseEntity.status(401).body(responseDto);
         }

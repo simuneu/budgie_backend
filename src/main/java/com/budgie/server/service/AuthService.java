@@ -1,6 +1,7 @@
 package com.budgie.server.service;
 
 import com.budgie.server.dto.AuthResponseDto;
+import com.budgie.server.dto.LoginRequestDto;
 import com.budgie.server.dto.UserSignupRequestDto;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.enums.UserStatus;
@@ -108,28 +109,6 @@ public class AuthService {
         return authRepository.save(newUser);
     }
 
-    //로그인 검사
-    public UserEntity findByEmailAndPassword(final String email, String password){
-        final Optional<UserEntity> userOptional = authRepository.findByEmail(email);
-        final UserEntity originalUSer = userOptional.orElse(null);
-
-        //사용자 존재여부 확인
-        if(originalUSer == null){
-            log.warn("유저를 찾을 수 없습니다.:{}",email);
-            return null;
-        }
-
-        if(originalUSer.getDeletedAt() != null || originalUSer.getUserStatus() == UserStatus.N){
-            throw new EntityNotFoundException("탈퇴된 계정입니다. 재가입이 필요합니다.");
-        }
-
-        //비밀번호 일치
-        if(passwordEncoder.matches(password, originalUSer.getPassword())){
-            return originalUSer;
-        }
-        log.warn("비밀번호가 이메일과 일치하지 않음 : {} ", email);
-        return null;
-    }
 
     public UserEntity getById(final Long id){
         Optional<UserEntity> userOptional = authRepository.findById(id);
@@ -140,15 +119,28 @@ public class AuthService {
         return authRepository.findByEmail(email);
     }
 
-    //로그인 검증 로직
-    public AuthResponseDto login(String email, String password){
-        //사용자 인증
-        UserEntity loginUser= findByEmail(email)
-                .orElseThrow(()->new RuntimeException("이메일, 비밀번호가 일치하지 않습니다."));
+    //로그인 검증
+    @Transactional
+    public AuthResponseDto login(LoginRequestDto requestDto){
+        final String email = requestDto.getEmail();
+        final String password = requestDto.getPassword();
+
+        //이메일로 사용자 조회
+        UserEntity loginUser= authRepository.findByEmail(email)
+            .orElseThrow(()->{
+                log.warn("인증 실패: 존재하지 않는 이메일{}", email);
+                throw  new RuntimeException("계정이 존재하지 않습니다.");
+            });
+        //탈퇴 계정 여부 확인
+        if(loginUser.getDeletedAt() !=null || loginUser.getUserStatus() == UserStatus.N){
+            log.warn("인증실패:탈퇴 계정 접근{}", email);
+            throw new EntityNotFoundException("탈퇴계정으로 재가입이 필요합니다.");
+        }
 
         //비번
         if(!passwordEncoder.matches(password, loginUser.getPassword())){
-            throw new RuntimeException("이메일, 비밀번호를 확인해주세요.");
+            log.warn("인증 실패: 비밀번호 불일치 {}", email);
+            throw new RuntimeException("비밀번호를 확인해주세요.");
         }
 
         //로그인 시 토큰 생성
