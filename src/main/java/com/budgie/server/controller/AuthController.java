@@ -1,14 +1,10 @@
 package com.budgie.server.controller;
 
-import com.budgie.server.dto.AuthResponseDto;
-import com.budgie.server.dto.ResponseDto;
-import com.budgie.server.dto.UserDto;
-import com.budgie.server.dto.UserSignupRequestDto;
+import com.budgie.server.dto.*;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,9 +50,10 @@ public class AuthController {
         }
     }
 
-    //로그아웃 - Security Context추출로 변경 필요+LogoutRequestDto
+    //로그아웃
     @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser(@RequestBody Long userId){
+    public ResponseEntity<?> logoutUser(@RequestBody LogoutRequestDto requestDto){
+        Long userId = requestDto.getUserId();
         try{
             log.info("로그아웃 요청 수신. userId:{}", userId);
             authService.logout(userId);
@@ -73,9 +70,10 @@ public class AuthController {
         }
     }
 
-    //토큰 갱신 - RefreshTokenRequestDto가
+    //토큰 갱신 -access+refresh발급
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshAccessToken(@RequestBody String refreshToken){
+    public ResponseEntity<?> refreshAccessToken(@RequestBody RefreshTokenRequestDto requestDto){
+        String refreshToken = requestDto.getRefreshTokenDto();
         try{
             log.info("access token 갱신 요청 수신");
             AuthResponseDto responseDto = authService.refreshAccessToken(refreshToken);
