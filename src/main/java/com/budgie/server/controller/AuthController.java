@@ -3,25 +3,35 @@ package com.budgie.server.controller;
 import com.budgie.server.dto.*;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.service.AuthService;
+import com.budgie.server.service.SocialLoginService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.service.annotation.GetExchange;
+
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+    @Value("${front.redirect.uri}")
+    private String frontUri;
+
     private final AuthService authService;
+    private final SocialLoginService socialLoginService;
 
     @Autowired
-    public AuthController(AuthService authService){
+    public AuthController(AuthService authService, SocialLoginService socialLoginService){
         this.authService = authService;
+        this.socialLoginService = socialLoginService;
     }
 
     @PostMapping("/signup")
@@ -48,6 +58,25 @@ public class AuthController {
                     .error(e.getMessage())
                     .build();
             return ResponseEntity.status(401).body(responseDto);
+        }
+    }
+
+    //카카오 소셜 로그인
+    @GetMapping("/kakao")
+    public void kakaoLogin(@RequestParam("code")String code, HttpServletResponse response) throws IOException{
+        try{
+            AuthResponseDto auth = socialLoginService.kakaoLogin(code);
+
+            String accessToken = auth.getAccessToken();
+            String refreshToken = auth.getRefreshToken();
+
+            String redirectUrl = frontUri+"/oauth/callback"+
+                    "?accessToken=" + URLEncoder.encode(accessToken, StandardCharsets.UTF_8) +
+                    "&refreshToken=" + URLEncoder.encode(refreshToken, StandardCharsets.UTF_8);
+            response.sendRedirect(redirectUrl);
+        }catch (Exception e){
+            String errorRedirectUrl = frontUri + "/login?error=" + URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            response.sendRedirect(errorRedirectUrl);
         }
     }
 
