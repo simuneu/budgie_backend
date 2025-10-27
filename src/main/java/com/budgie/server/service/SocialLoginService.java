@@ -1,9 +1,6 @@
 package com.budgie.server.service;
 
-import com.budgie.server.dto.AuthResponseDto;
-import com.budgie.server.dto.KakaoTokenResponseDto;
-import com.budgie.server.dto.KakaoUserInfoResponseDto;
-import com.budgie.server.dto.TokenResponseDto;
+import com.budgie.server.dto.*;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.repository.UserRepository;
 import com.budgie.server.security.JwtProvider;
@@ -11,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
@@ -24,6 +22,7 @@ public class SocialLoginService {
     private final KakaoLoginService kakaoLoginService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final NaverLoginService naverLoginService;
 
     public AuthResponseDto kakaoLogin(String code){
         KakaoTokenResponseDto kakaoToken = kakaoLoginService.getKakaoAccessToken(code);
@@ -39,16 +38,44 @@ public class SocialLoginService {
         String accessToken = jwtProvider.createAccessToken(userId);
         String refreshToken = jwtProvider.createRefreshToken(userId);
 
-        Instant expiryDate = jwtProvider.getRefreshTokenExpiryDate();
-        refreshTokenService.saveOrUpdate(loginUser, refreshToken, expiryDate);
 
-        //응담시간 dto
-        TokenResponseDto tokenInfo = TokenResponseDto.builder()
+//        TokenResponseDto tokenInfo = TokenResponseDto.builder()
+//                .accessToken(accessToken)
+//                .refreshToken(refreshToken)
+//                .grantType(jwtProvider.getGrantType())
+//                .accessTokenExpiresIn(jwtProvider.getAccessTokenExpirationTime())
+//                .build();
+        return AuthResponseDto.builder()
+                .email(userEmail)
+                .nickname(userNickname)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .grantType(jwtProvider.getGrantType())
                 .accessTokenExpiresIn(jwtProvider.getAccessTokenExpirationTime())
                 .build();
+    }
+
+    //네이버
+    @Transactional
+    public AuthResponseDto naverLogin(String code, String state){
+        //네이버 엑세스 토큰 획득
+        NaverTokenResponseDto naverToken = naverLoginService.getNaverAccessToken(code, state);
+
+        //토큰에서 사용자 정보 가져오기
+        NaverUserInfoResponseDto userInfo = naverLoginService.getNaverUserInfo(naverToken.getAccessToken());
+
+        //사용자 정보 디비 저장, 로그인
+        String userEmail = userInfo.getResponse().getEmail();
+        String userNickname = userInfo.getResponse().getNickname();
+
+        UserEntity loginUser = authService.findOrCreateUser(userEmail, userNickname);
+
+        Long userId = loginUser.getUserId();
+
+        //자체토큰 설정
+        String accessToken = jwtProvider.createAccessToken(userId);
+        String refreshToken = jwtProvider.createRefreshToken(userId);
+
         return AuthResponseDto.builder()
                 .email(userEmail)
                 .nickname(userNickname)

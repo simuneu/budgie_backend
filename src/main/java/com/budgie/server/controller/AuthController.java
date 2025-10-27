@@ -2,36 +2,54 @@ package com.budgie.server.controller;
 
 import com.budgie.server.dto.*;
 import com.budgie.server.entity.UserEntity;
+import com.budgie.server.security.JwtProvider;
 import com.budgie.server.service.AuthService;
+import com.budgie.server.service.NaverLoginService;
 import com.budgie.server.service.SocialLoginService;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisHash;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.service.annotation.GetExchange;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
     @Value("${front.redirect.uri}")
     private String frontUri;
 
+    @Value("${naver.client.id}")
+    private String naverClientId;
+
+    @Value("${naver.uri.redirect}")
+    private String redirectUri;
+
     private final AuthService authService;
     private final SocialLoginService socialLoginService;
+    private final JwtProvider jwtProvider;
+    private final NaverLoginService naverLoginService;
 
     @Autowired
-    public AuthController(AuthService authService, SocialLoginService socialLoginService){
+    public AuthController(AuthService authService, SocialLoginService socialLoginService,
+                          JwtProvider jwtProvider, NaverLoginService naverLoginService){
         this.authService = authService;
         this.socialLoginService = socialLoginService;
+        this.jwtProvider = jwtProvider;
+        this.naverLoginService = naverLoginService;
     }
 
     @PostMapping("/signup")
@@ -79,6 +97,50 @@ public class AuthController {
             response.sendRedirect(errorRedirectUrl);
         }
     }
+
+    //네이버 소셜 로그인
+    @GetMapping("/naver/loginstart")
+    public RedirectView redirectNaver(HttpSession session){
+        String state = jwtProvider.generateStateToken();
+        session.setAttribute("naver_oauth_state", state);
+        String naverAuthUrl = "https://nid.naver.com/oauth2.0/authorize" +
+                "?response_type=code" +
+                "&client_id=" + naverClientId +
+                "&redirect_uri=" + redirectUri +
+                "&state=" + state;
+        return new RedirectView(naverAuthUrl);
+    }
+
+    @GetMapping("/naver")
+    public void naverLogin (@RequestParam("code") String code, @RequestParam("state") String state,
+                            HttpSession session, HttpServletResponse response) throws IOException{
+        String savedState = (String) session.getAttribute("naver_oauth_state");
+
+        if (savedState == null || !savedState.equals(state)){
+            log.warn("Naver login failed: State token mismatch.");
+            String errorRedirectUrl = frontUri + "/login?error=" + URLEncoder.encode("State token mismatch.", StandardCharsets.UTF_8);
+            response.sendRedirect(errorRedirectUrl);
+            return;
+        }
+        try {
+            AuthResponseDto auth = socialLoginService.naverLogin(code, state);
+
+            String accessToken = auth.getAccessToken();
+            String refreshToken = auth.getRefreshToken();
+
+            String redirectUrl = frontUri + "/oauth/callback" +
+                    "?accessToken=" + URLEncoder.encode(accessToken, StandardCharsets.UTF_8) +
+                    "&refreshToken=" + URLEncoder.encode(refreshToken, StandardCharsets.UTF_8);
+
+            response.sendRedirect(redirectUrl);
+
+        } catch (Exception e) {
+            log.error("네이버 로그인 처리 중 에러 발생: {}", e.getMessage(), e);
+            String errorRedirectUrl = frontUri + "/login?error=" + URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            response.sendRedirect(errorRedirectUrl);
+        }
+    }
+
 
     //로그아웃
     @PostMapping("/logout")
