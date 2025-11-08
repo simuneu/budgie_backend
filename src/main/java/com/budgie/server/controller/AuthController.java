@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -178,21 +179,22 @@ public class AuthController {
         }
     }
 
-    //토큰 갱신 -access+refresh발급
+    //토큰 갱신 refresh기반 access재발급
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshAccessToken(@RequestBody RefreshTokenRequestDto requestDto){
-        String refreshToken = requestDto.getRefreshTokenDto();
+    public ResponseEntity<?> refreshAccessToken(@RequestBody Map<String, String>body){
+        String refreshToken = body.get("refreshToken");
+
+        if(refreshToken == null || refreshToken.isBlank()){
+            return ResponseEntity.badRequest().body("refreshToken이 필요합니다.");
+        }
+
         try{
-            log.info("access token 갱신 요청 수신");
-            AuthResponseDto responseDto = authService.refreshAccessToken(refreshToken);
-            return ResponseEntity.ok().body(responseDto);
+            AuthResponseDto newToken = authService.refreshAccessToken(refreshToken);
+            return ResponseEntity.ok(newToken);
         } catch (RuntimeException e) {
-            log.error("토큰 갱신 실패"+e.getMessage());
-            ResponseDto responseDto = ResponseDto.builder()
-                    .error("토큰 갱신 실패"+e.getMessage())
-                    .build();
+            log.warn("토큰 갱신 실패"+e.getMessage());
             //401/403
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseDto);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
 }

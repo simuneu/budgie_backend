@@ -40,7 +40,7 @@ public class RefreshTokenService {
         refreshTokenRepository.save(tokenEntity);
 
         String redisKey = "refresh_token:" +userId;
-        redisTemplate.expire(redisKey, ttlSeconds, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(redisKey, refreshToken, ttlSeconds, TimeUnit.SECONDS);
 
         log.info("Refresh Token저장 완료. userId={}, TTL={}초", userId, ttlSeconds);
     }
@@ -59,6 +59,13 @@ public class RefreshTokenService {
 
     //검증 메서드
     public boolean validateRefreshToken(Long userId, String refreshToken) {
+        String redisKey = "refresh_token:" + userId;
+        Object cachedToken = redisTemplate.opsForValue().get(redisKey);
+
+        if (cachedToken != null) {
+            return Objects.equals(cachedToken.toString(), refreshToken);
+        }
+
         return refreshTokenRepository.findById(userId)
             .filter(token -> token.getToken().equals(refreshToken))
             .isPresent();
@@ -81,8 +88,8 @@ public class RefreshTokenService {
 
         refreshTokenRepository.save(tokenEntity);
 
-        String redisKey = "refreshToken:"+userId;
-        redisTemplate.expire(redisKey, ttlSeconds, TimeUnit.SECONDS);
+        String redisKey = "refresh_token:" + userId;
+        redisTemplate.opsForValue().set(redisKey, refreshToken, ttlSeconds, TimeUnit.SECONDS);
         log.info("Refresh Token 저장/갱신 완료. user={}, TTL={}초", user.getEmail(), ttlSeconds);
 
     }
