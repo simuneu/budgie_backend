@@ -12,11 +12,9 @@ import org.springframework.data.redis.core.TimeToLive;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@RedisHash(value = "refreshToken", timeToLive = 604800)
+@RedisHash(value = "refreshToken", timeToLive = 0)
 public class RefreshTokenEntity {
     @Id
     private Long userId;
     private String token; //r.t
-    @TimeToLive
-    private Long expiration;
 }

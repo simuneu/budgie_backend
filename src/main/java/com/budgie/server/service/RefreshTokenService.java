@@ -6,10 +6,12 @@ import com.budgie.server.repository.RefreshTokenRepository;
 import com.budgie.server.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -19,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class RefreshTokenService {
     private final JwtProvider jwtProvider;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     //refresh token 저장, 업데이트
     public void saveRefreshToken(Long userId, String refreshToken){
@@ -32,10 +35,14 @@ public class RefreshTokenService {
         RefreshTokenEntity tokenEntity = RefreshTokenEntity.builder()
                 .userId(userId)
                 .token(refreshToken)
-                .expiration(ttlSeconds)
                 .build();
 
         refreshTokenRepository.save(tokenEntity);
+
+        String redisKey = "refresh_token:" +userId;
+        redisTemplate.expire(redisKey, ttlSeconds, TimeUnit.SECONDS);
+
+        log.info("Refresh Token저장 완료. userId={}, TTL={}초", userId, ttlSeconds);
     }
 
     //삭제
@@ -52,17 +59,14 @@ public class RefreshTokenService {
 
     //검증 메서드
     public boolean validateRefreshToken(Long userId, String refreshToken) {
-        Optional<RefreshTokenEntity> tokenOptional = refreshTokenRepository.findById(userId);
-
-        if (tokenOptional.isPresent()) {
-            return tokenOptional.get().getToken().equals(refreshToken);
-        }
-        return false;
+        return refreshTokenRepository.findById(userId)
+            .filter(token -> token.getToken().equals(refreshToken))
+            .isPresent();
     }
 
 
     //refresh토큰을 redis에 저장, 업데이트
-    public void saveOrUpdate(UserEntity user, String refreshToken, Instant expiryDate){
+    public void saveOrUpdate(UserEntity user, Long userId, String refreshToken, Instant expiryDate){
         Long ttlSeconds = expiryDate.getEpochSecond() - Instant.now().getEpochSecond();
 
         if(ttlSeconds <= 0){
@@ -71,12 +75,16 @@ public class RefreshTokenService {
         }
 
         RefreshTokenEntity tokenEntity = RefreshTokenEntity.builder()
-                .userId(user.getUserId())
+                .userId(userId)
                 .token(refreshToken)
-                .expiration(ttlSeconds)
                 .build();
 
         refreshTokenRepository.save(tokenEntity);
+
+        String redisKey = "refreshToken:"+userId;
+        redisTemplate.expire(redisKey, ttlSeconds, TimeUnit.SECONDS);
+        log.info("Refresh Token 저장/갱신 완료. user={}, TTL={}초", user.getEmail(), ttlSeconds);
+
     }
 
     //userId를 기반으로 redis의 토큰 조회

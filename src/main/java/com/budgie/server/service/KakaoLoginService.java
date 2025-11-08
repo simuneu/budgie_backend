@@ -43,10 +43,10 @@ public class KakaoLoginService {
                 request,
                 KakaoTokenResponseDto.class
         );
-        if(response.getStatusCode().is1xxInformational() && response.getBody() != null){
+        if(response.getStatusCode().is2xxSuccessful() && response.getBody() != null){
             return response.getBody();
         }
-        throw new RuntimeException("카카오 access token 획득 실패");
+        throw new RuntimeException("카카오 access token 획득 실패"+response.getStatusCode());
     }
 
     public KakaoUserInfoResponseDto getKakaoUserInfo(String kakaoAccessToken){

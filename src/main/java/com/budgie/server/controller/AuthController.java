@@ -32,6 +32,12 @@ public class AuthController {
     @Value("${front.redirect.uri}")
     private String frontUri;
 
+    @Value("${kakao.client.id}")
+    private String kakaoClientId;
+
+    @Value("${kakao.redirect.uri}")
+    private String kakaoRedirectUri;
+
     @Value("${naver.client.id}")
     private String naverClientId;
 
@@ -54,7 +60,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody UserSignupRequestDto requestDto){
-        log.info("회원가입 요청:{}", requestDto);
+        log.debug("회원가입 요청:{}", requestDto);
 
         try{
             UserEntity savedUser = authService.signup(requestDto);
@@ -80,6 +86,16 @@ public class AuthController {
     }
 
     //카카오 소셜 로그인
+    @GetMapping("/kakao/loginstart")
+    public RedirectView redirectToKakao() {
+        String kakaoAuthUrl = "https://kauth.kakao.com/oauth/authorize" +
+                "?client_id=" + kakaoClientId +
+                "&redirect_uri=" + kakaoRedirectUri +
+                "&response_type=code";
+        log.info("카카오 로그인 리다이렉트: {}", kakaoAuthUrl);
+        return new RedirectView(kakaoAuthUrl);
+    }
+
     @GetMapping("/kakao")
     public void kakaoLogin(@RequestParam("code")String code, HttpServletResponse response) throws IOException{
         try{

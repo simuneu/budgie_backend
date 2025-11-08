@@ -24,7 +24,9 @@ public class SocialLoginService {
     private final PasswordEncoder passwordEncoder;
     private final NaverLoginService naverLoginService;
 
+    @Transactional
     public AuthResponseDto kakaoLogin(String code){
+        log.info("카카오 로그인 요청 코드 수신:{}", code);
         KakaoTokenResponseDto kakaoToken = kakaoLoginService.getKakaoAccessToken(code);
         KakaoUserInfoResponseDto userInfo = kakaoLoginService.getKakaoUserInfo(kakaoToken.getAccessToken());
 
@@ -38,13 +40,6 @@ public class SocialLoginService {
         String accessToken = jwtProvider.createAccessToken(userId);
         String refreshToken = jwtProvider.createRefreshToken(userId);
 
-
-//        TokenResponseDto tokenInfo = TokenResponseDto.builder()
-//                .accessToken(accessToken)
-//                .refreshToken(refreshToken)
-//                .grantType(jwtProvider.getGrantType())
-//                .accessTokenExpiresIn(jwtProvider.getAccessTokenExpirationTime())
-//                .build();
         return AuthResponseDto.builder()
                 .email(userEmail)
                 .nickname(userNickname)
@@ -85,4 +80,5 @@ public class SocialLoginService {
                 .accessTokenExpiresIn(jwtProvider.getAccessTokenExpirationTime())
                 .build();
     }
+
 }
