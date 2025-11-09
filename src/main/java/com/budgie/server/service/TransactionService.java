@@ -55,8 +55,8 @@ public class TransactionService {
     }
 
     //소비, 지출 내역 수정하기
-    public TransactionDto updateTransaction(Long id, TransactionEntity updated){
-        TransactionEntity existing = transactionRepository.findById(id)
+    public TransactionDto updateTransaction(Long transactionId, TransactionEntity updated){
+        TransactionEntity existing = transactionRepository.findById(transactionId)
                 .orElseThrow(()->new IllegalArgumentException("내역을 찾을 수 없습니다."));
         existing.setCategory(updated.getCategory());
         existing.setAmount(updated.getAmount());
@@ -68,7 +68,7 @@ public class TransactionService {
     }
 
     //삭제
-    public void deletedTransaction(Long id){
-        transactionRepository.deleteById(id);
+    public void deletedTransaction(Long transactionId){
+        transactionRepository.deleteById(transactionId);
     }
 }
