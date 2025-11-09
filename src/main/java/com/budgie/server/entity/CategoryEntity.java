@@ -1,6 +1,7 @@
 package com.budgie.server.entity;
 
 import com.budgie.server.enums.BudgetType;
+import com.budgie.server.enums.CategoryName;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -26,8 +27,9 @@ public class CategoryEntity {
     @Column(nullable = false)
     private BudgetType budgetType; //income, exp
 
-    @Column(nullable = false, length = 50)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CategoryName name;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
