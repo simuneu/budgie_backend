@@ -5,6 +5,7 @@ import com.budgie.server.entity.CategoryEntity;
 import com.budgie.server.entity.TransactionEntity;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.mapper.TransactionMapper;
+import com.budgie.server.repository.CategoryRepository;
 import com.budgie.server.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Transaction;
@@ -18,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TransactionController {
     private final TransactionService transactionService;
+    private final CategoryRepository categoryRepository;
 
     //월별. 일별, 전체 조회
     @GetMapping
@@ -47,8 +49,8 @@ public class TransactionController {
         TransactionEntity entity = TransactionMapper.toEntity(dto);
         entity.setUser(user);
 
-        CategoryEntity category = new CategoryEntity();
-        category.setCategoryId(dto.getCategoryId());
+        CategoryEntity category = categoryRepository.findById(dto.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("카테고리를 찾을 수 없습니다."));
         entity.setCategory(category);
 
         return transactionService.createTransaction(entity);
@@ -70,7 +72,7 @@ public class TransactionController {
     }
 
     //삭제
-    @DeleteMapping("{transactionId")
+    @DeleteMapping("{transactionId}")
     public void deleteTransaction(@PathVariable Long transactionId){
         transactionService.deletedTransaction(transactionId);
     }

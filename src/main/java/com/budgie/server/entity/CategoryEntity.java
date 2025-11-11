@@ -1,5 +1,6 @@
 package com.budgie.server.entity;
 
+import com.budgie.server.converter.CategoryNameConverter;
 import com.budgie.server.enums.BudgetType;
 import com.budgie.server.enums.CategoryName;
 import jakarta.persistence.*;
@@ -27,8 +28,9 @@ public class CategoryEntity {
     @Column(nullable = false)
     private BudgetType budgetType; //income, exp
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+//    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, name="name")
+//    @Convert(converter = CategoryNameConverter.class)
     private CategoryName name;
 
     @CreationTimestamp

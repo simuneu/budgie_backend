@@ -8,7 +8,7 @@ public class TransactionMapper {
         return TransactionDto.builder()
                 .transactionId(entity.getTransactionId())
                 .categoryId(entity.getCategory().getCategoryId())
-                .categoryName(entity.getCategory().getName())
+                .categoryName(entity.getCategory().getName().getLabel())
                 .budgetType(entity.getBudgetType())
                 .amount(entity.getAmount())
                 .memo(entity.getMemo())

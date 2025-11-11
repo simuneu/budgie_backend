@@ -129,9 +129,14 @@ public class JwtProvider {
                 .getPayload();
         String userId = claims.getSubject();
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
-        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-    }
+        Long id = Long.parseLong(userId);
+
+        UserDetails userDetails = org.springframework.security.core.userdetails.User
+                .withUsername(userId) // principal.getName()
+                .password("")
+                .authorities("ROLE_USER")
+                .build();
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());    }
 
     //토큰에서 userId추출
     public Long getUserIdFromToken(String token){
