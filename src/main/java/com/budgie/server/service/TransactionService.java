@@ -84,4 +84,9 @@ public class TransactionService {
     public void deletedTransaction(Long transactionId){
         transactionRepository.deleteById(transactionId);
     }
+
+    //월 소비 합계
+    public Long getMonthlyExpense(Long userId, Integer year, Integer month){
+        return transactionRepository.sumMonthlyExpense(userId, year, month);
+    }
 }

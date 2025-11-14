@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -77,5 +78,14 @@ public class TransactionController {
     @DeleteMapping("{transactionId}")
     public void deleteTransaction(@PathVariable Long transactionId){
         transactionService.deletedTransaction(transactionId);
+    }
+
+    //월 소비 합계
+    @GetMapping("/summary")
+    public Map<String, Long> getMonthlySummary(@RequestParam Integer year, Integer month, Principal principal){
+        Long userId = Long.parseLong(principal.getName());
+        Long totalExpense = transactionService.getMonthlyExpense(userId, year, month);
+
+        return Map.of("totalExpense", totalExpense);
     }
 }

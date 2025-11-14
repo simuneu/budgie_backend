@@ -4,6 +4,7 @@ import com.budgie.server.entity.TransactionEntity;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.enums.BudgetType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -20,4 +21,13 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
 
     //타입 별 (소득/ 지출 조회)
     List<TransactionEntity> findByUserAndBudgetType(UserEntity user, BudgetType type);
+
+    //월 소비 합계
+    @Query("SELECT COALESCE(SUM(t.amount), 0) " +
+            "FROM TransactionEntity t " +
+            "WHERE t.user.userId = :userId " +
+            "AND YEAR(t.transactionDate) = :year " +
+            "AND MONTH(t.transactionDate) = :month " +
+            "AND t.budgetType = 'EXP'")
+    Long sumMonthlyExpense(Long userId, Integer year, Integer month);
 }
