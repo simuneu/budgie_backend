@@ -1,9 +1,11 @@
 package com.budgie.server.service;
 
 import com.budgie.server.dto.TransactionDto;
+import com.budgie.server.entity.CategoryEntity;
 import com.budgie.server.entity.TransactionEntity;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.mapper.TransactionMapper;
+import com.budgie.server.repository.CategoryRepository;
 import com.budgie.server.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class TransactionService {
     private final TransactionRepository transactionRepository;
+    private final CategoryRepository categoryRepository;
 
     //내역 가져오기
     public List<TransactionDto> getTransactions(UserEntity user){
@@ -58,7 +61,17 @@ public class TransactionService {
     public TransactionDto updateTransaction(Long transactionId, TransactionEntity updated){
         TransactionEntity existing = transactionRepository.findById(transactionId)
                 .orElseThrow(()->new IllegalArgumentException("내역을 찾을 수 없습니다."));
-        existing.setCategory(updated.getCategory());
+
+        //카테고리 조회
+        if(updated.getCategory() != null && updated.getCategory().getCategoryId() != null){
+            Long categoryId = updated.getCategory().getCategoryId();
+
+            CategoryEntity category = categoryRepository.findById(categoryId)
+                    .orElseThrow(()->new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
+
+            existing.setCategory(category);
+        }
+
         existing.setAmount(updated.getAmount());
         existing.setBudgetType(updated.getBudgetType());
         existing.setMemo(updated.getMemo());

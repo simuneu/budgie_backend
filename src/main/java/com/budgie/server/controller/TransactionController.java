@@ -22,6 +22,8 @@ public class TransactionController {
     private final CategoryRepository categoryRepository;
 
     //월별. 일별, 전체 조회
+    // --http://localhost:8080/api/transactions?year=2025&month=11
+    // transactions?year=2025&month=1&day=14
     @GetMapping
     public List<TransactionDto> getTransaction(
             @RequestParam(required = false) Integer year,

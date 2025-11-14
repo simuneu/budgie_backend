@@ -22,6 +22,7 @@ public class TransactionMapper {
                 .budgetType(dto.getBudgetType())
                 .amount(dto.getAmount())
                 .transactionDate(dto.getTransactionDate())
+                .memo(dto.getMemo())
                 .build();
     }
 }
