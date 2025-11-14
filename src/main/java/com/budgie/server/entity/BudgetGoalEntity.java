@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class BudgetGoalEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long goalId;
     private Long userId;
     private Integer year;
     private Integer month;

@@ -15,13 +15,13 @@ public class BudgetGoalService {
 
     //목표 조회
     public Optional<BudgetGoalEntity> getMonthlyGoal(Long userId, Integer year, Integer month){
-        return budgetGoalRepository.findByUserIdAndYearAnsMonth(userId, year, month);
+        return budgetGoalRepository.findByUserIdAndYearAndMonth(userId, year, month);
     }
 
     //목표 저장
     public BudgetGoalEntity savedGoal(Long userId, BudgetGoalDto dto){
         BudgetGoalEntity entity = budgetGoalRepository
-                .findByUserIdAndYearAnsMonth(userId, dto.getYear(), dto.getMonth())
+                .findByUserIdAndYearAndMonth(userId, dto.getYear(), dto.getMonth())
                 .orElse(BudgetGoalEntity.builder()
                         .userId(userId)
                         .year(dto.getYear())
