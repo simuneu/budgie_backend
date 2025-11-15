@@ -45,6 +45,7 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(authorize->authorize
                     .requestMatchers("/api/auth/**").permitAll() //접근허용
+                    .requestMatchers("/api/categories/**").authenticated()
             .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
