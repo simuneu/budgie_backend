@@ -20,14 +20,17 @@ public class BudgetGoalController {
     public BudgetGoalDto getGoal(@RequestParam Integer year, @RequestParam Integer month, Principal principal){
         Long userId = Long.parseLong(principal.getName());
 
-        Optional<BudgetGoalEntity> goal = budgetGoalService.getMonthlyGoal(userId, year, month);
+        BudgetGoalEntity goal = budgetGoalService.getGoal(userId, year, month);
 
-        return goal.map(g -> BudgetGoalDto.builder()
-                .year(g.getYear())
-                .month(g.getMonth())
-                .goalAmount(g.getGoalAmount())
-                .build())
-                .orElse(null); //없으면 null 프론트에서 모달 띄우게 하기
+        if(goal == null){
+            return null;
+        }
+
+        return BudgetGoalDto.builder()
+                .year(goal.getYear())
+                .month(goal.getMonth())
+                .goalAmount(goal.getGoalAmount())
+                .build();
     }
 
     //목표 저장

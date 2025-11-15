@@ -14,8 +14,10 @@ public class BudgetGoalService {
     private final BudgetGoalRepository budgetGoalRepository;
 
     //목표 조회
-    public Optional<BudgetGoalEntity> getMonthlyGoal(Long userId, Integer year, Integer month){
-        return budgetGoalRepository.findByUserIdAndYearAndMonth(userId, year, month);
+    public BudgetGoalEntity getGoal(Long userId, Integer year, Integer month){
+        return budgetGoalRepository
+                .findByUserIdAndYearAndMonth(userId, year, month)
+                .orElse(null);
     }
 
     //목표 저장
