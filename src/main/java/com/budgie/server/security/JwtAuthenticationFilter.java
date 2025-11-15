@@ -28,15 +28,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if(header != null && header.startsWith("Bearer ")){
             String token = header.substring(7);
+
+            log.info("######## 요청 URI: {}", request.getRequestURI());
+            log.info("########추출된 토큰: {}", token);
+
             if(jwtProvider.validateToken(token)){
                 Authentication authentication = jwtProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.debug("jwt인증 성공, userId:{}", authentication.getName());
+                log.debug("########jwt인증 성공, userId:{}", authentication.getName());
             }else{
-                log.warn("jwt 검증 실패");
+                log.warn("########jwt 검증 실패");
             }
         }else{
-            log.trace("요청에 Authorization 헤더없음:{}", request.getRequestURI());
+            log.trace("########요청에 Authorization 헤더없음:{}", request.getRequestURI());
         }
         filterChain.doFilter(request, response);
     }

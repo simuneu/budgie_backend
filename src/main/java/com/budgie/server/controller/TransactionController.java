@@ -55,8 +55,10 @@ public class TransactionController {
         CategoryEntity category = categoryRepository.findById(dto.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("카테고리를 찾을 수 없습니다."));
         entity.setCategory(category);
+        entity.setBudgetType(category.getBudgetType());
 
         return transactionService.createTransaction(entity);
+
     }
 
     //수정
