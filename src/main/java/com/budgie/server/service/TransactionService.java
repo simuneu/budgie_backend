@@ -70,10 +70,10 @@ public class TransactionService {
                     .orElseThrow(()->new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
 
             existing.setCategory(category);
+            existing.setBudgetType(category.getBudgetType());
         }
 
         existing.setAmount(updated.getAmount());
-        existing.setBudgetType(updated.getBudgetType());
         existing.setMemo(updated.getMemo());
         existing.setTransactionDate(updated.getTransactionDate());
 

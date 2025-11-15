@@ -69,8 +69,9 @@ public class TransactionController {
     ){
         TransactionEntity updated = TransactionMapper.toEntity(dto);
 
-        CategoryEntity category = new CategoryEntity();
-        category.setCategoryId(dto.getCategoryId());
+        CategoryEntity category = categoryRepository.findById(dto.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("카테고리 id를 찾을 수 없음: " + dto.getCategoryId()));
+
         updated.setCategory(category);
 
         return transactionService.updateTransaction(transactionId, updated);
