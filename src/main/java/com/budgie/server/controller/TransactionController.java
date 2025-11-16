@@ -1,12 +1,14 @@
 package com.budgie.server.controller;
 
 import com.budgie.server.dto.CategorySummaryDto;
+import com.budgie.server.dto.RecordedDayDto;
 import com.budgie.server.dto.TransactionDto;
 import com.budgie.server.entity.CategoryEntity;
 import com.budgie.server.entity.TransactionEntity;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.mapper.TransactionMapper;
 import com.budgie.server.repository.CategoryRepository;
+import com.budgie.server.security.CustomUserDetailsService;
 import com.budgie.server.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Transaction;
@@ -115,5 +117,16 @@ public class TransactionController {
         return ResponseEntity.ok(
                 transactionService.getMonthlyIncomeSummary(userId, year, month)
         );
+    }
+
+    //기록 일 조회
+    @GetMapping("/days")
+    public ResponseEntity<List<RecordedDayDto>> getRecordedDays(@RequestParam int year, @RequestParam int month,
+                                                                @AuthenticationPrincipal UserDetails user){
+        Long userId = Long.parseLong(user.getUsername());
+
+        List<RecordedDayDto> result = transactionService.getRecordedDays(year, month, userId);
+
+        return ResponseEntity.ok(result);
     }
 }

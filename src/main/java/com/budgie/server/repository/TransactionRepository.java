@@ -1,6 +1,7 @@
 package com.budgie.server.repository;
 
 import com.budgie.server.dto.CategorySummaryDto;
+import com.budgie.server.dto.RecordedDayDto;
 import com.budgie.server.entity.TransactionEntity;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.enums.BudgetType;
@@ -41,7 +42,8 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
         )
         FROM TransactionEntity t
         JOIN t.category c
-        WHERE YEAR(t.transactionDate) = :year
+        WHERE t.user.userId = :userId
+          AND YEAR(t.transactionDate) = :year
           AND MONTH(t.transactionDate) = :month
           AND t.budgetType = com.budgie.server.enums.BudgetType.EXP
         GROUP BY c.name
@@ -52,6 +54,7 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             @Param("year") int year,
             @Param("month") int month
     );
+
 
     @Query("""
         SELECT new com.budgie.server.dto.CategorySummaryDto(
@@ -71,4 +74,23 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             @Param("year") int year,
             @Param("month") int month
     );
+
+    @Query("""
+        SELECT new com.budgie.server.dto.RecordedDayDto(
+            EXTRACT(DAY FROM t.transactionDate),
+            SUM(t.amount)
+        )
+        FROM TransactionEntity t
+        WHERE EXTRACT(YEAR FROM t.transactionDate) = :year
+          AND EXTRACT(MONTH FROM t.transactionDate) = :month
+          AND t.user.userId = :userId
+        GROUP BY EXTRACT(DAY FROM t.transactionDate)
+    """)
+    List<RecordedDayDto> findRecordedDays(
+            @Param("year") int year,
+            @Param("month") int month,
+            @Param("userId") Long userId
+    );
+
+
 }
