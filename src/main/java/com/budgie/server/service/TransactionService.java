@@ -91,8 +91,13 @@ public class TransactionService {
         return transactionRepository.sumMonthlyExpense(userId, year, month);
     }
 
-    //월 카테고리 합
+    //월 카테고리 합 - 지출
     public List<CategorySummaryDto> getMonthlyCategorySummary(Long userId, int year, int month){
         return transactionRepository.getMonthlyCategorySummary(userId, year, month);
+    }
+
+    //월 카테고리 합 - 수입
+    public List<CategorySummaryDto> getMonthlyIncomeSummary(Long userId, int year, int month) {
+        return transactionRepository.getMonthlyIncomeSummary(userId, year, month);
     }
 }

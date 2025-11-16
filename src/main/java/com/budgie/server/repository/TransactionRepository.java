@@ -52,4 +52,23 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             @Param("year") int year,
             @Param("month") int month
     );
+
+    @Query("""
+        SELECT new com.budgie.server.dto.CategorySummaryDto(
+            c.name,
+            SUM(t.amount)
+        )
+        FROM TransactionEntity t
+        JOIN t.category c
+        WHERE t.user.userId = :userId
+          AND YEAR(t.transactionDate) = :year
+          AND MONTH(t.transactionDate) = :month
+          AND t.budgetType = com.budgie.server.enums.BudgetType.INCOME
+        GROUP BY c.name
+        ORDER BY SUM(t.amount) DESC """)
+    List<CategorySummaryDto> getMonthlyIncomeSummary(
+            @Param("userId") Long userId,
+            @Param("year") int year,
+            @Param("month") int month
+    );
 }

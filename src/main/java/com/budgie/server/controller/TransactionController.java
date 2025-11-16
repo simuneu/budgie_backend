@@ -96,7 +96,7 @@ public class TransactionController {
         return Map.of("totalExpense", totalExpense);
     }
 
-    //월 카테고리 합계
+    //월 카테고리 합계 - 지출
     @GetMapping("/summary/category")
     public ResponseEntity<?> getCategorySummary(@RequestParam int year, @RequestParam int month, @AuthenticationPrincipal UserDetails user){
 
@@ -104,6 +104,16 @@ public class TransactionController {
 
         return ResponseEntity.ok(
                 transactionService.getMonthlyCategorySummary(userId, year, month)
+        );
+    }
+
+    //월 카테고리 합계 - 수입
+    @GetMapping("/summary/category/income")
+    public ResponseEntity<?> getIncomeCategorySummary(@RequestParam int year, @RequestParam int month, @AuthenticationPrincipal UserDetails user){
+        Long userId = Long.parseLong(user.getUsername());
+
+        return ResponseEntity.ok(
+                transactionService.getMonthlyIncomeSummary(userId, year, month)
         );
     }
 }
