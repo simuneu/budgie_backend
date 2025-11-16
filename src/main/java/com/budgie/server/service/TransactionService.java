@@ -1,5 +1,6 @@
 package com.budgie.server.service;
 
+import com.budgie.server.dto.CategorySummaryDto;
 import com.budgie.server.dto.TransactionDto;
 import com.budgie.server.entity.CategoryEntity;
 import com.budgie.server.entity.TransactionEntity;
@@ -88,5 +89,10 @@ public class TransactionService {
     //월 소비 합계
     public Long getMonthlyExpense(Long userId, Integer year, Integer month){
         return transactionRepository.sumMonthlyExpense(userId, year, month);
+    }
+
+    //월 카테고리 합
+    public List<CategorySummaryDto> getMonthlyCategorySummary(Long userId, int year, int month){
+        return transactionRepository.getMonthlyCategorySummary(userId, year, month);
     }
 }

@@ -1,10 +1,12 @@
 package com.budgie.server.repository;
 
+import com.budgie.server.dto.CategorySummaryDto;
 import com.budgie.server.entity.TransactionEntity;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.enums.BudgetType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -30,4 +32,24 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             "AND MONTH(t.transactionDate) = :month " +
             "AND t.budgetType = 'EXP'")
     Long sumMonthlyExpense(Long userId, Integer year, Integer month);
+
+    //월별 카테고리별 지툴 합
+    @Query("""
+        SELECT new com.budgie.server.dto.CategorySummaryDto(
+            c.name,
+            SUM(t.amount)
+        )
+        FROM TransactionEntity t
+        JOIN t.category c
+        WHERE YEAR(t.transactionDate) = :year
+          AND MONTH(t.transactionDate) = :month
+          AND t.budgetType = com.budgie.server.enums.BudgetType.EXP
+        GROUP BY c.name
+        ORDER BY SUM(t.amount) DESC
+    """)
+    List<CategorySummaryDto> getMonthlyCategorySummary(
+            @Param("userId") Long userId,
+            @Param("year") int year,
+            @Param("month") int month
+    );
 }

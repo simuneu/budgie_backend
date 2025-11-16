@@ -1,5 +1,6 @@
 package com.budgie.server.controller;
 
+import com.budgie.server.dto.CategorySummaryDto;
 import com.budgie.server.dto.TransactionDto;
 import com.budgie.server.entity.CategoryEntity;
 import com.budgie.server.entity.TransactionEntity;
@@ -9,6 +10,9 @@ import com.budgie.server.repository.CategoryRepository;
 import com.budgie.server.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Transaction;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -90,5 +94,16 @@ public class TransactionController {
         Long totalExpense = transactionService.getMonthlyExpense(userId, year, month);
 
         return Map.of("totalExpense", totalExpense);
+    }
+
+    //월 카테고리 합계
+    @GetMapping("/summary/category")
+    public ResponseEntity<?> getCategorySummary(@RequestParam int year, @RequestParam int month, @AuthenticationPrincipal UserDetails user){
+
+        Long userId = Long.parseLong(user.getUsername());
+
+        return ResponseEntity.ok(
+                transactionService.getMonthlyCategorySummary(userId, year, month)
+        );
     }
 }
