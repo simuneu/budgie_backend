@@ -1,6 +1,7 @@
 package com.budgie.server.controller;
 
 import com.budgie.server.dto.DailyExpenseDto;
+import com.budgie.server.dto.WeeklyExpenseDto;
 import com.budgie.server.service.StatisticsService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -27,4 +28,14 @@ public class StatisticsController {
         List<DailyExpenseDto> result = statisticsService.getDailyExpense(userId, year, month);
         return ResponseEntity.ok(result);
     }
+
+    //요일별 합계
+    @GetMapping("/{year}/{month}/weekday")
+    public ResponseEntity<List<WeeklyExpenseDto>> geyWeeklyExpense(@PathVariable int year, @PathVariable int month,
+                                                                   Principal principal){
+        Long userId = Long.parseLong(principal.getName());
+        List<WeeklyExpenseDto> result = statisticsService.getWeeklyExpense(userId, year, month);
+        return ResponseEntity.ok(result);
+    }
+
 }

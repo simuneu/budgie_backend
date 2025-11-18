@@ -113,4 +113,46 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             @Param("year") int year,
             @Param("month") int month
     );
+
+    //요일별 조회
+    @Query(
+            value = "SELECT " +
+                    "(WEEKDAY(t.transaction_date) + 1) AS weekday, " +
+                    "CAST(SUM(t.amount) AS UNSIGNED) AS totalAmount " +
+                    "FROM transaction t " +
+                    "WHERE t.user_id = :userId " +
+                    "AND t.budget_type = 'EXP' " +
+                    "AND YEAR(t.transaction_date) = :year " +
+                    "AND MONTH(t.transaction_date) = :month " +
+                    "GROUP BY (WEEKDAY(t.transaction_date) + 1) " +
+                    "ORDER BY (WEEKDAY(t.transaction_date) + 1)",
+            nativeQuery = true
+    )
+    List<Object[]> getWeeklyExpense(
+            @Param("userId") Long userId,
+            @Param("year") int year,
+            @Param("month") int month
+    );
+
+    //카테고리 탑3
+    @Query(
+            value = "SELECT " +
+                    "t.category_name AS categoryName, " +
+                    "CAST(SUM(t.amount) AS UNSIGNED) AS totalAmount " +
+                    "FROM transaction t " +
+                    "WHERE t.user_id = :userId " +
+                    "AND t.budget_type = 'EXP' " +
+                    "AND YEAR(t.transaction_date) = :year " +
+                    "AND MONTH(t.transaction_date) = :month " +
+                    "GROUP BY t.category_name " +
+                    "ORDER BY totalAmount DESC " +
+                    "LIMIT 3",
+            nativeQuery = true
+    )
+    List<Object[]> getTop3Categories(
+            @Param("userId") Long userId,
+            @Param("year") int year,
+            @Param("month") int month
+    );
+
 }
