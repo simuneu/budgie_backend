@@ -1,9 +1,12 @@
 package com.budgie.server.controller;
 
 import com.budgie.server.dto.BudgetGoalDto;
+import com.budgie.server.dto.GoalRequestDto;
+import com.budgie.server.dto.GoalResponseDto;
 import com.budgie.server.entity.BudgetGoalEntity;
 import com.budgie.server.service.BudgetGoalService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -44,5 +47,15 @@ public class BudgetGoalController {
                 .month(saved.getMonth())
                 .goalAmount(saved.getGoalAmount())
                 .build();
+    }
+
+    //목표 수정
+    @PutMapping("/{year}/{month}")
+    public ResponseEntity<?> updateGoal(Principal principal, @PathVariable int year,
+                                        @PathVariable int month, @RequestBody GoalRequestDto request){
+        Long userId = Long.parseLong(principal.getName());
+
+        GoalResponseDto updated = budgetGoalService.updateGoal(userId, year, month, request);
+        return ResponseEntity.ok(updated);
     }
 }
