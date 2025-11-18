@@ -105,12 +105,5 @@ public class TransactionService {
         return transactionRepository.findRecordedDays(year, month, userId);
     }
 
-    //카테고리 탑3
-    public List<TopCategoryDto> getTop3Categories(Long userId, int year, int month){
-        List<Object[]> rows = transactionRepository.getTop3Categories(userId, year, month);
-        return rows.stream().map(r->new TopCategoryDto(
-                (String) r[0],
-                ((Number) r[1]).longValue()
-        )).toList();
-    }
+
 }

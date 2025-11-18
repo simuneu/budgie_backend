@@ -156,4 +156,20 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             @Param("month") int month
     );
 
+    //전월 대비 증감 조회
+    @Query(
+            value = "SELECT CAST(SUM(t.amount) AS UNSIGNED) AS totalAmount " +
+                    "FROM transaction t " +
+                    "WHERE t.user_id = :userId " +
+                    "AND t.budget_type = 'EXP' " +
+                    "AND YEAR(t.transaction_date) = :year " +
+                    "AND MONTH(t.transaction_date) = :month",
+            nativeQuery = true
+    )
+    Long getMonthlyExpense(
+            @Param("userId") Long userId,
+            @Param("year") int year,
+            @Param("month") int month
+    );
+
 }

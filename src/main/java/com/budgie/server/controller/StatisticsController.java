@@ -1,6 +1,8 @@
 package com.budgie.server.controller;
 
+import com.budgie.server.dto.CompareExpenseDto;
 import com.budgie.server.dto.DailyExpenseDto;
+import com.budgie.server.dto.TopCategoryDto;
 import com.budgie.server.dto.WeeklyExpenseDto;
 import com.budgie.server.service.StatisticsService;
 import lombok.Getter;
@@ -38,4 +40,17 @@ public class StatisticsController {
         return ResponseEntity.ok(result);
     }
 
+    //탑3카테고리
+    @GetMapping("/summary/top3/{year}/{month}")
+    public List<TopCategoryDto> getTop3(@PathVariable  int year, @PathVariable int month, Principal principal){
+        Long userId = Long.parseLong(principal.getName());
+        return statisticsService.getTop3Categories(userId, year, month);
+    }
+
+    //전월 증감
+    @GetMapping("/summary/compare/{year}/{month}")
+    public CompareExpenseDto getCompare(@PathVariable int year, @PathVariable int month, Principal principal){
+        Long userId = Long.parseLong(principal.getName());
+        return statisticsService.getCompareExpense(userId, year, month);
+    }
 }

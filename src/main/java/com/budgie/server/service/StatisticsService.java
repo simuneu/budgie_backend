@@ -1,11 +1,14 @@
 package com.budgie.server.service;
 
+import com.budgie.server.dto.CompareExpenseDto;
 import com.budgie.server.dto.DailyExpenseDto;
+import com.budgie.server.dto.TopCategoryDto;
 import com.budgie.server.dto.WeeklyExpenseDto;
 import com.budgie.server.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.swing.*;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
@@ -31,5 +34,48 @@ public class StatisticsService {
                                 : BigDecimal.valueOf(((Number) r[1]).longValue())
                 ))
                 .toList();
+    }
+
+    //카테고리 탑3
+    public List<TopCategoryDto> getTop3Categories(Long userId, int year, int month){
+        List<Object[]> rows = transactionRepository.getTop3Categories(userId, year, month);
+        return rows.stream().map(r->new TopCategoryDto(
+                (String) r[0],
+                ((Number) r[1]).longValue()
+        )).toList();
+    }
+
+    //전월 증감
+    public CompareExpenseDto getCompareExpense(Long userId, int year, int month){
+        int prevYear = year;
+        int prevMonth = month -1;
+
+        if(month == 1){
+            prevYear = year-1;
+            prevMonth = 12;
+        }
+
+        //이번 달 총 지출
+        Long current = transactionRepository.getMonthlyExpense(userId, year, month);
+        if(current == null){
+            current = 0L;
+        }
+        //저번 달 총 지출
+        Long previous = transactionRepository.getMonthlyExpense(userId,  prevYear, prevMonth);
+        if(previous == null){
+            previous = 0L;
+        }
+        //차이
+        Long difference = current - previous;
+
+        //변화율
+        double percent = (previous==0) ? 0.0 : (difference / (double)previous) *100;
+
+        return CompareExpenseDto.builder()
+                .current(current)
+                .previous(previous)
+                .difference(difference)
+                .percent(Math.round(percent*10)/10.0)
+                .build();
     }
 }

@@ -131,10 +131,5 @@ public class TransactionController {
         return ResponseEntity.ok(result);
     }
 
-    //탑3카테고리
-    @GetMapping("/summary/top3/{year}/{month}")
-    public List<TopCategoryDto> getTop3(@PathVariable  int year, @PathVariable int month, Principal principal){
-        Long userId = Long.parseLong(principal.getName());
-        return transactionService.getTop3Categories(userId, year, month);
-    }
+
 }
