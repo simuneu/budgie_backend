@@ -1,6 +1,7 @@
 package com.budgie.server.service;
 
 import com.budgie.server.dto.CategorySummaryDto;
+import com.budgie.server.dto.DailyExpenseDto;
 import com.budgie.server.dto.RecordedDayDto;
 import com.budgie.server.dto.TransactionDto;
 import com.budgie.server.entity.CategoryEntity;

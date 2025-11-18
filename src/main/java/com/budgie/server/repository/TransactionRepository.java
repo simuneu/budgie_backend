@@ -1,6 +1,7 @@
 package com.budgie.server.repository;
 
 import com.budgie.server.dto.CategorySummaryDto;
+import com.budgie.server.dto.DailyExpenseDto;
 import com.budgie.server.dto.RecordedDayDto;
 import com.budgie.server.entity.TransactionEntity;
 import com.budgie.server.entity.UserEntity;
@@ -93,4 +94,23 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
     );
 
 
+    //일 합 조회
+    @Query(
+            value = "SELECT " +
+                    "DAY(t.transaction_date) AS day, " +
+                    "SUM(t.amount) AS totalAmount " +
+                    "FROM transaction t " +
+                    "WHERE t.user_id = :userId " +
+                    "AND t.budget_type = 'EXP' " +
+                    "AND YEAR(t.transaction_date) = :year " +
+                    "AND MONTH(t.transaction_date) = :month " +
+                    "GROUP BY DAY(t.transaction_date) " +
+                    "ORDER BY DAY(t.transaction_date)",
+            nativeQuery = true
+    )
+    List<DailyExpenseDto> getDailyExpense(
+            @Param("userId") Long userId,
+            @Param("year") int year,
+            @Param("month") int month
+    );
 }
