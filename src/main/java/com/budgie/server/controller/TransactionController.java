@@ -2,6 +2,7 @@ package com.budgie.server.controller;
 
 import com.budgie.server.dto.CategorySummaryDto;
 import com.budgie.server.dto.RecordedDayDto;
+import com.budgie.server.dto.TopCategoryDto;
 import com.budgie.server.dto.TransactionDto;
 import com.budgie.server.entity.CategoryEntity;
 import com.budgie.server.entity.TransactionEntity;
@@ -128,5 +129,12 @@ public class TransactionController {
         List<RecordedDayDto> result = transactionService.getRecordedDays(year, month, userId);
 
         return ResponseEntity.ok(result);
+    }
+
+    //탑3카테고리
+    @GetMapping("/summary/top3/{year}/{month}")
+    public List<TopCategoryDto> getTop3(@PathVariable  int year, @PathVariable int month, Principal principal){
+        Long userId = Long.parseLong(principal.getName());
+        return transactionService.getTop3Categories(userId, year, month);
     }
 }

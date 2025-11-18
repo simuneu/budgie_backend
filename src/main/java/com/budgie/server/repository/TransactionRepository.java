@@ -137,14 +137,15 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
     //카테고리 탑3
     @Query(
             value = "SELECT " +
-                    "t.category_name AS categoryName, " +
+                    "c.name AS categoryName, " +
                     "CAST(SUM(t.amount) AS UNSIGNED) AS totalAmount " +
                     "FROM transaction t " +
+                    "JOIN category c ON t.category_id = c.category_id " +
                     "WHERE t.user_id = :userId " +
                     "AND t.budget_type = 'EXP' " +
                     "AND YEAR(t.transaction_date) = :year " +
                     "AND MONTH(t.transaction_date) = :month " +
-                    "GROUP BY t.category_name " +
+                    "GROUP BY c.name " +
                     "ORDER BY totalAmount DESC " +
                     "LIMIT 3",
             nativeQuery = true

@@ -1,9 +1,6 @@
 package com.budgie.server.service;
 
-import com.budgie.server.dto.CategorySummaryDto;
-import com.budgie.server.dto.DailyExpenseDto;
-import com.budgie.server.dto.RecordedDayDto;
-import com.budgie.server.dto.TransactionDto;
+import com.budgie.server.dto.*;
 import com.budgie.server.entity.CategoryEntity;
 import com.budgie.server.entity.TransactionEntity;
 import com.budgie.server.entity.UserEntity;
@@ -106,5 +103,14 @@ public class TransactionService {
     //기록한 낳 조회
     public List<RecordedDayDto> getRecordedDays(int year, int month, Long userId){
         return transactionRepository.findRecordedDays(year, month, userId);
+    }
+
+    //카테고리 탑3
+    public List<TopCategoryDto> getTop3Categories(Long userId, int year, int month){
+        List<Object[]> rows = transactionRepository.getTop3Categories(userId, year, month);
+        return rows.stream().map(r->new TopCategoryDto(
+                (String) r[0],
+                ((Number) r[1]).longValue()
+        )).toList();
     }
 }

@@ -1,5 +1,6 @@
 package com.budgie.server.service;
 
+import com.budgie.server.dto.TopCategoryDto;
 import com.budgie.server.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,4 +49,5 @@ public class TokenService {
         String saved = getRefreshToken(userId);
         return saved != null && saved.equals(providedToken);
     }
+
 }
