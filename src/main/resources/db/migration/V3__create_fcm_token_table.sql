@@ -1,0 +1,9 @@
+CREATE TABLE fcm_token (
+    fcm_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    token VARCHAR(512) NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_fcm_token_user
+        FOREIGN KEY (user_id) REFERENCES user(user_id)
+);

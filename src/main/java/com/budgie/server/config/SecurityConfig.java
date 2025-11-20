@@ -50,7 +50,8 @@ public class SecurityConfig {
                     .requestMatchers("/api/auth/**").permitAll() //접근허용
                     .requestMatchers("/api/categories/**", "/api/categories").authenticated()
                     .requestMatchers("/api/transactions/**").authenticated()
-            .anyRequest().authenticated())
+                    .requestMatchers(HttpMethod.POST, "/api/fcm/token").permitAll()
+                    .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
             return http.build();
