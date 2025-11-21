@@ -26,16 +26,19 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
     //타입 별 (소득/ 지출 조회)
     List<TransactionEntity> findByUserAndBudgetType(UserEntity user, BudgetType type);
 
-    //월 소비 합계
-    @Query("SELECT COALESCE(SUM(t.amount), 0) " +
-            "FROM TransactionEntity t " +
-            "WHERE t.user.userId = :userId " +
-            "AND YEAR(t.transactionDate) = :year " +
-            "AND MONTH(t.transactionDate) = :month " +
-            "AND t.budgetType = 'EXP'")
+    // 월 소비 합계 (EXP + soft delete 제외)
+    @Query("""
+        SELECT COALESCE(SUM(t.amount), 0)
+        FROM TransactionEntity t
+        WHERE t.user.userId = :userId
+          AND YEAR(t.transactionDate) = :year
+          AND MONTH(t.transactionDate) = :month
+          AND t.budgetType = 'EXP'
+          AND t.deletedAt IS NULL
+    """)
     Long sumMonthlyExpense(Long userId, Integer year, Integer month);
 
-    //월별 카테고리별 지툴 합
+    // 월별 지출 카테고리 합계
     @Query("""
         SELECT new com.budgie.server.dto.CategorySummaryDto(
             c.name,
@@ -47,6 +50,7 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
           AND YEAR(t.transactionDate) = :year
           AND MONTH(t.transactionDate) = :month
           AND t.budgetType = com.budgie.server.enums.BudgetType.EXP
+          AND t.deletedAt IS NULL
         GROUP BY c.name
         ORDER BY SUM(t.amount) DESC
     """)
@@ -57,6 +61,7 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
     );
 
 
+    // 월별 수입 카테고리 합계
     @Query("""
         SELECT new com.budgie.server.dto.CategorySummaryDto(
             c.name,
@@ -68,14 +73,17 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
           AND YEAR(t.transactionDate) = :year
           AND MONTH(t.transactionDate) = :month
           AND t.budgetType = com.budgie.server.enums.BudgetType.INCOME
+          AND t.deletedAt IS NULL
         GROUP BY c.name
-        ORDER BY SUM(t.amount) DESC """)
+        ORDER BY SUM(t.amount) DESC
+    """)
     List<CategorySummaryDto> getMonthlyIncomeSummary(
             @Param("userId") Long userId,
             @Param("year") int year,
             @Param("month") int month
     );
 
+    // 달력 점찍기용 일별 소비합계
     @Query("""
         SELECT new com.budgie.server.dto.RecordedDayDto(
             EXTRACT(DAY FROM t.transactionDate),
@@ -85,6 +93,8 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
         WHERE EXTRACT(YEAR FROM t.transactionDate) = :year
           AND EXTRACT(MONTH FROM t.transactionDate) = :month
           AND t.user.userId = :userId
+          AND t.budgetType = com.budgie.server.enums.BudgetType.EXP
+          AND t.deletedAt IS NULL
         GROUP BY EXTRACT(DAY FROM t.transactionDate)
     """)
     List<RecordedDayDto> findRecordedDays(
@@ -94,7 +104,7 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
     );
 
 
-    //일 합 조회
+    // 일별 소비 합계
     @Query(
             value = "SELECT " +
                     "DAY(t.transaction_date) AS day, " +
@@ -104,6 +114,7 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
                     "AND t.budget_type = 'EXP' " +
                     "AND YEAR(t.transaction_date) = :year " +
                     "AND MONTH(t.transaction_date) = :month " +
+                    "AND t.deleted_at IS NULL " +  // 추가!!!
                     "GROUP BY DAY(t.transaction_date) " +
                     "ORDER BY DAY(t.transaction_date)",
             nativeQuery = true
@@ -114,7 +125,7 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             @Param("month") int month
     );
 
-    //요일별 조회
+    // 요일별 소비
     @Query(
             value = "SELECT " +
                     "(WEEKDAY(t.transaction_date) + 1) AS weekday, " +
@@ -124,6 +135,7 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
                     "AND t.budget_type = 'EXP' " +
                     "AND YEAR(t.transaction_date) = :year " +
                     "AND MONTH(t.transaction_date) = :month " +
+                    "AND t.deleted_at IS NULL " +  // 추가!!!
                     "GROUP BY (WEEKDAY(t.transaction_date) + 1) " +
                     "ORDER BY (WEEKDAY(t.transaction_date) + 1)",
             nativeQuery = true
@@ -134,7 +146,8 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             @Param("month") int month
     );
 
-    //카테고리 탑3
+
+    // 카테고리 TOP3
     @Query(
             value = "SELECT " +
                     "c.name AS categoryName, " +
@@ -145,6 +158,7 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
                     "AND t.budget_type = 'EXP' " +
                     "AND YEAR(t.transaction_date) = :year " +
                     "AND MONTH(t.transaction_date) = :month " +
+                    "AND t.deleted_at IS NULL " +  // 추가!!!
                     "GROUP BY c.name " +
                     "ORDER BY totalAmount DESC " +
                     "LIMIT 3",
@@ -156,14 +170,16 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             @Param("month") int month
     );
 
-    //전월 대비 증감 조회
+
+    // 전월 대비 증감 조회
     @Query(
             value = "SELECT CAST(SUM(t.amount) AS UNSIGNED) AS totalAmount " +
                     "FROM transaction t " +
                     "WHERE t.user_id = :userId " +
                     "AND t.budget_type = 'EXP' " +
                     "AND YEAR(t.transaction_date) = :year " +
-                    "AND MONTH(t.transaction_date) = :month",
+                    "AND MONTH(t.transaction_date) = :month " +
+                    "AND t.deleted_at IS NULL",
             nativeQuery = true
     )
     Long getMonthlyExpense(
@@ -171,5 +187,4 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             @Param("year") int year,
             @Param("month") int month
     );
-
 }
