@@ -20,6 +20,10 @@ public class FcmController {
 
     @PostMapping("/token")
     public ResponseEntity<?> saveFcmToken(@RequestBody Map<String, String> body, Principal principal){
+        if (principal == null) {
+            return ResponseEntity.ok().build();
+        }
+
         Long userId = Long.parseLong(principal.getName());
         String token = body.get("token");
 

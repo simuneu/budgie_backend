@@ -48,9 +48,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorize->authorize
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers("/api/auth/**").permitAll() //접근허용
+                    .requestMatchers(HttpMethod.POST, "/api/fcm/token").permitAll()
                     .requestMatchers("/api/categories/**", "/api/categories").authenticated()
                     .requestMatchers("/api/transactions/**").authenticated()
-                    .requestMatchers(HttpMethod.POST, "/api/fcm/token").permitAll()
                     .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
