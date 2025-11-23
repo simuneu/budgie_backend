@@ -1,5 +1,6 @@
 package com.budgie.server.service;
 
+import com.budgie.server.dto.DailyTrendDto;
 import com.budgie.server.dto.SpendingPaceResponseDto;
 import com.budgie.server.dto.WeekdayExpenseDto;
 import com.budgie.server.entity.BudgetGoalEntity;
@@ -103,5 +104,24 @@ public class AnalysisService {
             case 6 -> "SUNDAY";
             default -> "UNKNOWN";
         };
+    }
+
+    //날짜별 소비경향
+    public List<DailyTrendDto> getDailyTrend(Long userId, int year, int month){
+        List<Object[]> results = transactionRepository.getDailyTrend(userId, year, month);
+
+        List<DailyTrendDto> response = new ArrayList<>();
+
+        //조회된 날만 응담(0원인 날 제외)
+        for(Object[] row:results){
+            int day = ((Number)row[0]).intValue();
+
+            BigDecimal total =(row[1]!=null)
+                    ?(BigDecimal)row[1]
+                    :BigDecimal.ZERO;
+
+            response.add(new DailyTrendDto(day, total));
+        }
+        return response;
     }
 }

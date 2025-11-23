@@ -207,4 +207,25 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             @Param("year") int year,
             @Param("month") int month
     );
+
+    //날짜별 소비 경향
+    @Query(value = """
+        SELECT 
+            DAY(t.transaction_date) AS day,
+            SUM(t.amount) AS totalAmount
+        FROM transaction t
+        WHERE t.user_id = :userId
+          AND t.budget_type = 'EXP'
+          AND YEAR(t.transaction_date) = :year
+          AND MONTH(t.transaction_date) = :month
+          AND t.deleted_at IS NULL
+        GROUP BY day
+        ORDER BY day
+    """, nativeQuery = true)
+    List<Object[]> getDailyTrend(
+            @Param("userId") Long userId,
+            @Param("year") int year,
+            @Param("month") int month
+    );
+
 }

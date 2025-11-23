@@ -1,9 +1,11 @@
 package com.budgie.server.controller;
 
+import com.budgie.server.dto.DailyTrendDto;
 import com.budgie.server.dto.SpendingPaceResponseDto;
 import com.budgie.server.dto.WeekdayExpenseDto;
 import com.budgie.server.service.AnalysisService;
 import io.opencensus.trace.Link;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,5 +34,12 @@ public class AnalysisController {
     public List<WeekdayExpenseDto> getWeekdayPattern(@RequestParam int year, @RequestParam int month, Principal principal){
         Long userId = Long.parseLong(principal.getName());
         return analysisService.getWeekdayPattern(userId, year, month);
+    }
+
+    //날짜별 소비 경향
+    @GetMapping("/daily-trend")
+    public List<DailyTrendDto> getDailyTrend(@RequestParam int year, @RequestParam int month, Principal principal){
+        Long userId = Long.parseLong(principal.getName());
+        return analysisService.getDailyTrend(userId, year, month);
     }
 }
