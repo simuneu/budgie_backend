@@ -5,12 +5,14 @@ import com.budgie.server.dto.MonthlyTrendDto;
 import com.budgie.server.dto.SpendingPaceResponseDto;
 import com.budgie.server.dto.WeekdayExpenseDto;
 import com.budgie.server.entity.BudgetGoalEntity;
+import com.budgie.server.enums.DangerLevel;
 import com.budgie.server.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -46,7 +48,10 @@ public class AnalysisService {
 
         //상태 위험 계산
         String paceStatus = calculatePaceStatus(expectedEnd, budgetGoal);
-        String dangerLevel = calculateDangerLevel(expectedEnd,budgetGoal);
+        DangerLevel dangerLevel = calculateDangerLevel(
+                BigDecimal.valueOf(expectedEnd),
+                BigDecimal.valueOf(budgetGoal)
+        );
 
         return SpendingPaceResponseDto.builder()
                 .year(year)
@@ -56,7 +61,7 @@ public class AnalysisService {
                 .dailyAvg(dailyAvg)
                 .expectedEndOfMonth(expectedEnd)
                 .paceStatus(paceStatus)
-                .dangerLevel(dangerLevel)
+                .dangerLevel(dangerLevel.name())
                 .build();
     }
 
@@ -67,13 +72,21 @@ public class AnalysisService {
         return "NORMAL";
     }
 
-    private String calculateDangerLevel(long expectedEnd, long budgetGoal){
-        if(budgetGoal == 0) return "LOW";
-        double ratio = (double) expectedEnd / budgetGoal;
+    //위헙레벨 계산
+    private DangerLevel calculateDangerLevel(BigDecimal expectedEnd, BigDecimal budgetGoal){
+        if(budgetGoal.compareTo(BigDecimal.ZERO)==0){
+            return DangerLevel.LOW;
+        }
 
-        if(ratio>=1.2) return "HIGH";
-        if(ratio>=1.0) return "MID";
-        return "LOW";
+        BigDecimal ratio = expectedEnd.divide(budgetGoal, 2, RoundingMode.HALF_UP);
+        if(ratio.compareTo(new BigDecimal("1.2")) >=0){
+            return DangerLevel.HIGH;
+        }
+
+        if(ratio.compareTo(BigDecimal.ONE)>=0){
+            return DangerLevel.MID;
+        }
+        return DangerLevel.LOW;
     }
 
     //요일별 소비패턴
