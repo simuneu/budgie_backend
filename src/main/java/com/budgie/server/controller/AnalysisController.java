@@ -1,0 +1,36 @@
+package com.budgie.server.controller;
+
+import com.budgie.server.dto.SpendingPaceResponseDto;
+import com.budgie.server.dto.WeekdayExpenseDto;
+import com.budgie.server.service.AnalysisService;
+import io.opencensus.trace.Link;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.security.Principal;
+import java.util.List;
+
+@RestController
+@RequestMapping("api/analysis")
+@RequiredArgsConstructor
+public class AnalysisController {
+    private final AnalysisService analysisService;
+
+    //지출 속도
+    @GetMapping("/spending-pace")
+    public SpendingPaceResponseDto getSpendingPace(@RequestParam int year, @RequestParam int month,
+                                                   Principal principal){
+        Long userId = Long.parseLong(principal.getName());
+        return analysisService.getSpendingPace(userId, year,month);
+    }
+
+    //요일소비패턴
+    @GetMapping("/weekday-pattern")
+    public List<WeekdayExpenseDto> getWeekdayPattern(@RequestParam int year, @RequestParam int month, Principal principal){
+        Long userId = Long.parseLong(principal.getName());
+        return analysisService.getWeekdayPattern(userId, year, month);
+    }
+}

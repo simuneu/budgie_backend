@@ -187,4 +187,24 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             @Param("year") int year,
             @Param("month") int month
     );
+
+    //요일별 소비패턴
+    @Query(value = """
+        SELECT 
+            WEEKDAY(t.transaction_date) AS weekday,
+            SUM(t.amount) AS totalAmount
+        FROM transaction t
+        WHERE t.user_id = :userId
+          AND t.budget_type = 'EXP'
+          AND YEAR(t.transaction_date) = :year
+          AND MONTH(t.transaction_date) = :month
+          AND t.deleted_at IS NULL
+        GROUP BY weekday
+        ORDER BY weekday
+        """, nativeQuery = true)
+    List<Object[]> getWeekdayExpense(
+            @Param("userId") Long userId,
+            @Param("year") int year,
+            @Param("month") int month
+    );
 }
