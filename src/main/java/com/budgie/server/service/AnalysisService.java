@@ -1,6 +1,7 @@
 package com.budgie.server.service;
 
 import com.budgie.server.dto.DailyTrendDto;
+import com.budgie.server.dto.MonthlyTrendDto;
 import com.budgie.server.dto.SpendingPaceResponseDto;
 import com.budgie.server.dto.WeekdayExpenseDto;
 import com.budgie.server.entity.BudgetGoalEntity;
@@ -123,5 +124,32 @@ public class AnalysisService {
             response.add(new DailyTrendDto(day, total));
         }
         return response;
+    }
+
+    //월별 지출 추세
+    public List<MonthlyTrendDto> getMonthlyTrend(Long userId, int year, int month, int count){
+        if(count<=0){
+            count=3; //3개월
+        }
+        YearMonth current = YearMonth.of(year, month);
+        List<MonthlyTrendDto> result = new ArrayList<>();
+
+        //오>최
+        for(int i = count-1; i>=0; i--){
+            YearMonth target = current.minusMonths(i);
+
+            Long total = transactionRepository.getMonthlyExpense(userId, target.getYear(), target.getMonthValue());
+            if(total == null){
+                total =0L;
+            }
+            BigDecimal totalAmount = BigDecimal.valueOf(total);
+
+            result.add(new MonthlyTrendDto(
+                    target.getYear(),
+                    target.getMonthValue(),
+                    totalAmount
+            ));
+        }
+        return result;
     }
 }

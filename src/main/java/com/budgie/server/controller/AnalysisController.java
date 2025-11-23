@@ -1,6 +1,7 @@
 package com.budgie.server.controller;
 
 import com.budgie.server.dto.DailyTrendDto;
+import com.budgie.server.dto.MonthlyTrendDto;
 import com.budgie.server.dto.SpendingPaceResponseDto;
 import com.budgie.server.dto.WeekdayExpenseDto;
 import com.budgie.server.service.AnalysisService;
@@ -41,5 +42,14 @@ public class AnalysisController {
     public List<DailyTrendDto> getDailyTrend(@RequestParam int year, @RequestParam int month, Principal principal){
         Long userId = Long.parseLong(principal.getName());
         return analysisService.getDailyTrend(userId, year, month);
+    }
+
+    //월별 소비 추세
+    @GetMapping("/monthly-trend")
+    public List<MonthlyTrendDto> getMonthlyTrend( @RequestParam int year,@RequestParam int month,
+                                                  @RequestParam(required = false, defaultValue = "3")int count,
+                                                  Principal principal){
+        Long userId = Long.parseLong(principal.getName());
+        return analysisService.getMonthlyTrend(userId, year, month, count);
     }
 }
