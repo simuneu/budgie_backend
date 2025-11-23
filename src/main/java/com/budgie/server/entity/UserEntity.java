@@ -45,4 +45,7 @@ public class UserEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    @Column(name = "fcm_token")
+    private String fcmToken;
 }

@@ -1,7 +1,7 @@
 package com.budgie.server.service;
 
-import com.budgie.server.entity.FcmTokenEntity;
-import com.budgie.server.repository.FcmTokenRepository;
+import com.budgie.server.entity.UserEntity;
+import com.budgie.server.repository.UserRepository;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import lombok.RequiredArgsConstructor;
@@ -13,23 +13,26 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class FcmService {
 
-    private final FcmTokenRepository fcmTokenRepository;
+    private final UserRepository userRepository;
 
     public void saveToken(Long userId, String token){
 
-        FcmTokenEntity entity = fcmTokenRepository.findByUserId(userId)
-                .orElse(FcmTokenEntity.builder()
-                        .userId(userId)
-                        .build());
-        entity.setToken(token);
-        fcmTokenRepository.save(entity);
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        user.setFcmToken(token);
+        userRepository.save(user);
     }
 
-    public void sendMessage(String token, String title, String body){
+    public void send(String token, String title, String body){
         Message message = Message.builder()
                 .setToken(token)
-                .putData("title", title)
-                .putData("body", body)
+                .setNotification(
+                        com.google.firebase.messaging.Notification.builder()
+                                .setTitle(title)
+                                .setBody(body)
+                                .build()
+                )
                 .build();
 
         try{
