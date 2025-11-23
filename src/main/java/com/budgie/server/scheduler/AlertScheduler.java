@@ -25,7 +25,8 @@ public class AlertScheduler {
     private final FcmService fcmService;
     private  final UserRepository userRepository;
 
-    @Scheduled(cron = "0 0 9 * * *") //초 분 시 일 월 요일 - 9시
+    @Scheduled(cron = "0 0 9,12,14,18,22 * * *")
+//    @Scheduled(cron = "0 0 9 * * *") //초 분 시 일 월 요일 - 9시
     public void runDailyAlertCheck(){
         log.info("AlertScheduler : 매일 체크를 시작");
 
@@ -39,6 +40,8 @@ public class AlertScheduler {
 
             //유저 지출 속도 분석
             SpendingPaceResponseDto pace = analysisService.getSpendingPace(userId, year, month);
+            log.info("** dangerLevel = {}", pace.getDangerLevel());
+
 
             //위헙도 알림
             if(pace.getDangerLevel().equals("HIGH")){

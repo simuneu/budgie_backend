@@ -30,7 +30,8 @@ public class AnalysisService {
     //지출속도
     public SpendingPaceResponseDto getSpendingPace(Long userId, int year, int month){
         //이번 달 지출 총액
-        long totalExpense = transactionRepository.getMonthlyExpense(userId, year, month);
+        Long monthlyExpense = transactionRepository.getMonthlyExpense(userId, year, month);
+        long totalExpense = (monthlyExpense != null) ? monthlyExpense : 0L;
 
         //목표 예산
         BudgetGoalEntity goal = budgetGoalService.getGoal(userId, year, month);
@@ -79,11 +80,13 @@ public class AnalysisService {
         }
 
         BigDecimal ratio = expectedEnd.divide(budgetGoal, 2, RoundingMode.HALF_UP);
-        if(ratio.compareTo(new BigDecimal("1.2")) >=0){
+
+        //예산 초과
+        if(ratio.compareTo(BigDecimal.ONE) > 0){
             return DangerLevel.HIGH;
         }
-
-        if(ratio.compareTo(BigDecimal.ONE)>=0){
+        //근접
+        if(ratio.compareTo(BigDecimal.ONE) == 0){
             return DangerLevel.MID;
         }
         return DangerLevel.LOW;

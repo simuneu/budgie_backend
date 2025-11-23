@@ -2,10 +2,7 @@ package com.budgie.server.entity;
 
 import com.budgie.server.enums.AlertType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 import java.time.LocalDateTime;
@@ -13,6 +10,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name="alert")
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

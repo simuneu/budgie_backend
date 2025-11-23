@@ -4,11 +4,13 @@ import com.budgie.server.entity.AlertEntity;
 import com.budgie.server.enums.AlertType;
 import com.budgie.server.repository.AlertRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AlertService {
@@ -21,6 +23,7 @@ public class AlertService {
 
         boolean exists = alertRepository.existsByUserIdAndTypeAndCreatedAtBetween(
                 userId, type, startOfDay, endOfDay);
+        log.info("EXISTS? {}", exists);
         if(exists) return; //이미 보냈으면 안 보냄
 
         AlertEntity alert = AlertEntity.builder()

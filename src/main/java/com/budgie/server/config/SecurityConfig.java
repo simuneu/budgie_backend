@@ -51,6 +51,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.POST, "/api/fcm/token").permitAll()
                     .requestMatchers("/api/categories/**", "/api/categories").authenticated()
                     .requestMatchers("/api/transactions/**").authenticated()
+                    .requestMatchers("/api/alert/**").authenticated()
                     .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -61,7 +62,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOriginPatterns(List.of("http://localhost:5173"));
+        config.setAllowedOrigins(List.of("http://localhost:5173"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.addAllowedHeader("*");
         config.setExposedHeaders(List.of("Authorization"));

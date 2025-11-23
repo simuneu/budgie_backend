@@ -27,13 +27,9 @@ public class FcmService {
     public void send(String token, String title, String body){
         Message message = Message.builder()
                 .setToken(token)
-                .setNotification(
-                        com.google.firebase.messaging.Notification.builder()
-                                .setTitle(title)
-                                .setBody(body)
-                                .build()
-                )
-                .build();
+                .putData("title", title)
+                .putData("body", body)
+                                .build();
 
         try{
             String response = FirebaseMessaging.getInstance().send(message);
