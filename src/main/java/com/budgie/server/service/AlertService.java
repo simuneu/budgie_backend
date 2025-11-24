@@ -37,4 +37,7 @@ public class AlertService {
         alertRepository.save(alert);
     }
 
+    public boolean existsMonthlyAlert(Long userId, AlertType type){
+        return alertRepository.existsMonthlyAlert(userId, type);
+    }
 }

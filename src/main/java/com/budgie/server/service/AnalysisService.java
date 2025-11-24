@@ -92,6 +92,14 @@ public class AnalysisService {
         return DangerLevel.LOW;
     }
 
+    //%알림
+    public int calculateUsageRate(long totalExpense, long budgetGoal){
+        if(budgetGoal == 0){
+            return 0;
+        }
+        return (int)((totalExpense*100)/budgetGoal);
+    }
+
     //요일별 소비패턴
     public List<WeekdayExpenseDto> getWeekdayPattern(Long userId, int year, int month){
         List<Object[]> results = transactionRepository.getWeekdayExpense(userId, year, month);
