@@ -2,7 +2,7 @@ package com.budgie.server.service;
 
 import com.budgie.server.dto.AuthResponseDto;
 import com.budgie.server.dto.LoginRequestDto;
-import com.budgie.server.dto.PasswordResetRequest;
+import com.budgie.server.dto.PasswordResetRequestDto;
 import com.budgie.server.dto.UserSignupRequestDto;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.enums.UserStatus;
@@ -10,21 +10,10 @@ import com.budgie.server.repository.AuthRepository;
 import com.budgie.server.security.JwtProvider;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
 
-import javax.management.relation.RelationNotFoundException;
-import javax.naming.AuthenticationException;
-import javax.swing.text.html.Option;
-import java.security.Principal;
-import java.security.SecureRandom;
-import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -231,7 +220,7 @@ public class AuthService {
 
     //비번 코드 검증
     @Transactional
-    public void resetPassword(PasswordResetRequest dto){
+    public void resetPassword(PasswordResetRequestDto dto){
         String email = dto.getEmail();
         String code = dto.getCode();
         String newPassword = dto.getNewPassword();

@@ -1,14 +1,15 @@
 package com.budgie.server.controller;
 
+import com.budgie.server.dto.PasswordChangeRequestDto;
 import com.budgie.server.dto.UserInfoDto;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.repository.UserRepository;
+import com.budgie.server.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
@@ -17,6 +18,7 @@ import java.security.Principal;
 @RequiredArgsConstructor
 public class UserController {
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @GetMapping("/me")
     public UserInfoDto getMyInfo(Principal principal){
@@ -30,5 +32,13 @@ public class UserController {
                 .email(user.getEmail())
                 .nickname(user.getNickname())
                 .build();
+    }
+
+    //비번 변경
+    @PutMapping("/password")
+    public ResponseEntity<?> changePassword(Principal principal, @RequestBody PasswordChangeRequestDto dto){
+        Long userId = Long.parseLong(principal.getName());
+        userService.changePassword(userId, dto);
+        return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
     }
 }

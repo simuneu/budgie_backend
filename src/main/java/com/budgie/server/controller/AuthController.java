@@ -12,16 +12,13 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisHash;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Map;
@@ -216,7 +213,7 @@ public class AuthController {
 
     //비밀번호 재설정 완료
     @PostMapping("/password/reset")
-    public ResponseEntity<?> resetPassword(@RequestParam PasswordResetRequest dto){
+    public ResponseEntity<?> resetPassword(@RequestParam PasswordResetRequestDto dto){
         authService.resetPassword(dto);
         return ResponseEntity.ok("비번 재설정 완료");
     }
