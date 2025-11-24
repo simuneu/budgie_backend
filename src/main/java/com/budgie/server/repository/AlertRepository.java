@@ -21,6 +21,8 @@ public interface AlertRepository extends JpaRepository<AlertEntity, Long> {
 
     List<AlertEntity> findByUserIdOrderByCreatedAtDesc(Long userId);
 
+    int countByUserIdAndReadFalse(Long userId);
+
     @Query("""
     SELECT COUNT(a)
     FROM AlertEntity a
@@ -32,5 +34,6 @@ public interface AlertRepository extends JpaRepository<AlertEntity, Long> {
                            AlertType type,
                            LocalDateTime start,
                            LocalDateTime end);
+
 
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -45,5 +46,24 @@ public class AlertService {
         Long count = alertRepository.countMonthlyAlert(userId, type, start, end);
 
         return count != null && count > 0;
+    }
+
+    //읽음 전체 처리
+    public void markAllAsRead(Long userId){
+        List<AlertEntity> alerts = alertRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        alerts.forEach(alert -> {
+            if(!alert.isRead()) alert.setRead(true);
+        });
+        alertRepository.saveAll(alerts);
+    }
+
+    //알림 목록 조회
+    public List<AlertEntity> getAlerts(Long userId){
+        return alertRepository.findByUserIdOrderByCreatedAtDesc(userId);
+    }
+
+    //읽지 않은 알림 수
+    public int getUnreadCount(Long userId){
+        return alertRepository.countByUserIdAndReadFalse(userId);
     }
 }
