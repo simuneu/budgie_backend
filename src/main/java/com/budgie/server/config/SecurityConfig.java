@@ -37,25 +37,23 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
-        //jwt로 세션관리
-        http.sessionManagement(session->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        //접근 권한 설정
-
-            .authorizeHttpRequests(authorize->authorize
-                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                    .requestMatchers("/api/auth/**").permitAll() //접근허용
-                    .requestMatchers(HttpMethod.POST, "/api/fcm/token").permitAll()
-                    .requestMatchers("/api/categories/**", "/api/categories").authenticated()
-                    .requestMatchers("/api/transactions/**").authenticated()
-                    .requestMatchers("/api/alert/**").authenticated()
-                    .anyRequest().authenticated())
+        http.csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/fcm/token").permitAll()
+                        .requestMatchers("/api/categories/**", "/api/categories").authenticated()
+                        .requestMatchers("/api/transactions/**").authenticated()
+                        .requestMatchers("/api/alert/**").authenticated()
+                        .requestMatchers("/api/users/**").authenticated()
+                        .anyRequest().authenticated()
+                )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-            return http.build();
+        return http.build();
     }
 
     @Bean

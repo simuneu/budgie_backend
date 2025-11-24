@@ -3,7 +3,6 @@ package com.budgie.server.entity;
 import com.budgie.server.enums.AlertType;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 import java.time.LocalDateTime;
 

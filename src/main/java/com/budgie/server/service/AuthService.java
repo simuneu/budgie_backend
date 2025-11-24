@@ -14,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -239,5 +241,26 @@ public class AuthService {
         //변경
         user.setPassword(passwordEncoder.encode(newPassword));
         log.info("비밀번호 재설정 완료: {}", email);
+    }
+
+    //탈퇴
+    @Transactional
+    public void deleteAccount(Long userId, String password){
+        UserEntity user = authRepository.findById(userId)
+                .orElseThrow(()->new EntityNotFoundException("유저를 차을 수 없습니다."));
+
+        //비번 검증
+        if(!passwordEncoder.matches(password, user.getPassword())){
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+        }
+
+        //rt삭제
+        refreshTokenService.deletedRefreshToken(userId);
+
+        //soft delete처리
+        user.setUserStatus(UserStatus.N);
+        user.setDeletedAt(LocalDateTime.now());
+
+        log.info("소프트 딜리트 완료 userId:{}", userId);
     }
 }

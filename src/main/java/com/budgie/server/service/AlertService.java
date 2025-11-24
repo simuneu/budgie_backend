@@ -38,6 +38,12 @@ public class AlertService {
     }
 
     public boolean existsMonthlyAlert(Long userId, AlertType type){
-        return alertRepository.existsMonthlyAlert(userId, type);
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.withDayOfMonth(1).atStartOfDay();
+        LocalDateTime end = today.withDayOfMonth(today.lengthOfMonth()).atTime(23, 59, 59);
+
+        Long count = alertRepository.countMonthlyAlert(userId, type, start, end);
+
+        return count != null && count > 0;
     }
 }

@@ -21,15 +21,16 @@ public interface AlertRepository extends JpaRepository<AlertEntity, Long> {
 
     List<AlertEntity> findByUserIdOrderByCreatedAtDesc(Long userId);
 
-    //중복 알림 방지
     @Query("""
-        SELECT COUNT(a) > 0
-        FROM AlertEntity a
-        WHERE a.user.userId = :userId
-          AND a.type = :type
-          AND MONTH(a.createdAt) = MONTH(CURRENT_DATE)
-          AND YEAR(a.createdAt) = YEAR(CURRENT_DATE)
-    """)
-    boolean existsMonthlyAlert(Long userId, AlertType type);
+    SELECT COUNT(a)
+    FROM AlertEntity a
+    WHERE a.userId = :userId
+      AND a.type = :type
+      AND a.createdAt BETWEEN :start AND :end
+""")
+    Long countMonthlyAlert(Long userId,
+                           AlertType type,
+                           LocalDateTime start,
+                           LocalDateTime end);
 
 }

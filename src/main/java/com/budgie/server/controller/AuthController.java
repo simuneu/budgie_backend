@@ -158,24 +158,24 @@ public class AuthController {
 
 
     //로그아웃
-    @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser(@RequestBody LogoutRequestDto requestDto){
-        Long userId = requestDto.getUserId();
-        try{
-            log.info("로그아웃 요청 수신. userId:{}", userId);
-            authService.logout(userId);
-            ResponseDto responseDto = ResponseDto.builder()
-                    .message("로그아웃 성공")
-                    .build();
-            return ResponseEntity.ok().body(responseDto);
-        }catch (Exception e){
-            log.error("로그아웃 중 오류 발생 :"+e.getMessage());
-            ResponseDto responseDto = ResponseDto.builder()
-                    .error("로그아웃 처리 실패: " + e.getMessage())
-                    .build();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDto);
-        }
-    }
+//    @PostMapping("/logout")
+//    public ResponseEntity<?> logoutUser(@RequestBody LogoutRequestDto requestDto){
+//        Long userId = requestDto.getUserId();
+//        try{
+//            log.info("로그아웃 요청 수신. userId:{}", userId);
+//            authService.logout(userId);
+//            ResponseDto responseDto = ResponseDto.builder()
+//                    .message("로그아웃 성공")
+//                    .build();
+//            return ResponseEntity.ok().body(responseDto);
+//        }catch (Exception e){
+//            log.error("로그아웃 중 오류 발생 :"+e.getMessage());
+//            ResponseDto responseDto = ResponseDto.builder()
+//                    .error("로그아웃 처리 실패: " + e.getMessage())
+//                    .build();
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDto);
+//        }
+//    }
 
     //토큰 갱신 refresh기반 access재발급
     @PostMapping("/refresh")
@@ -206,14 +206,14 @@ public class AuthController {
 
     //비밀번호 재설정(임시비번)
     @PostMapping("/password/reset-request")
-    public ResponseEntity<?> requestPasswordReset(@RequestParam String email){
-        authService.setPasswordResetCode(email);
+    public ResponseEntity<?> requestPasswordReset(@RequestBody  EmailRequestDto dto){
+        authService.setPasswordResetCode(dto.getEmail());
         return ResponseEntity.ok("리셋 코드 전송 완료");
     }
 
     //비밀번호 재설정 완료
     @PostMapping("/password/reset")
-    public ResponseEntity<?> resetPassword(@RequestParam PasswordResetRequestDto dto){
+    public ResponseEntity<?> resetPassword(@RequestBody  PasswordResetRequestDto dto){
         authService.resetPassword(dto);
         return ResponseEntity.ok("비번 재설정 완료");
     }
