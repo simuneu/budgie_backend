@@ -217,4 +217,13 @@ public class AuthController {
         authService.resetPassword(dto);
         return ResponseEntity.ok("비번 재설정 완료");
     }
+
+    //탈퇴
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteAccount(Principal principal, @RequestBody DeleteAccountRequestDto dto){
+        Long userId = Long.parseLong(principal.getName());
+        authService.deleteAccount(userId, dto.getPassword());
+
+        return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+    }
 }
