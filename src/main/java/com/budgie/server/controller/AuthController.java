@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.util.Map;
 
 @Slf4j
@@ -197,4 +198,13 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
+
+    //로그아웃
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(Principal principal) {
+        Long userId = Long.parseLong(principal.getName());
+        authService.logout(userId);
+        return ResponseEntity.ok("logout success");
+    }
+
 }

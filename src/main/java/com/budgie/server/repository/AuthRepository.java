@@ -17,4 +17,7 @@ public interface AuthRepository extends JpaRepository<UserEntity, Long> {
 
     @Query("select user from UserEntity user where user.email = :email")
     Optional<UserEntity> findByEmailWithDeleted(String email);
+
+    //로그아웃
+    void deleteByUserId(Long userId);
 }

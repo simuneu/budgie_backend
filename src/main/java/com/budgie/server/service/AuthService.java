@@ -10,14 +10,18 @@ import com.budgie.server.security.JwtProvider;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.management.relation.RelationNotFoundException;
 import javax.naming.AuthenticationException;
 import javax.swing.text.html.Option;
+import java.security.Principal;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Optional;
@@ -209,5 +213,4 @@ public class AuthService {
                 .grantType(jwtProvider.getGrantType())
                 .build();
     }
-
 }
