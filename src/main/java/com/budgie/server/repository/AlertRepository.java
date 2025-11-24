@@ -21,7 +21,7 @@ public interface AlertRepository extends JpaRepository<AlertEntity, Long> {
 
     List<AlertEntity> findByUserIdOrderByCreatedAtDesc(Long userId);
 
-    int countByUserIdAndReadFalse(Long userId);
+    int countByUserIdAndIsReadFalse(Long userId);
 
     @Query("""
     SELECT COUNT(a)

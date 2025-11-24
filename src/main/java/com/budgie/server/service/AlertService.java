@@ -64,6 +64,6 @@ public class AlertService {
 
     //읽지 않은 알림 수
     public int getUnreadCount(Long userId){
-        return alertRepository.countByUserIdAndReadFalse(userId);
+        return alertRepository.countByUserIdAndIsReadFalse(userId);
     }
 }
