@@ -36,11 +36,20 @@ public class UserService {
         }
 
         //새 비번 규칙 검사
-        if ((!dto.getNewPassword().matches(PASSWORD_REGEX)){
+        if ((!dto.getNewPassword().matches(PASSWORD_REGEX))){
             throw new RuntimeException("비밀번호는 영문, 숫자, 특수문자 포함 8자리 이상이어야 합니다.");
         }
 
         //저장
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+    }
+
+    //닉네임 변경
+    @Transactional
+    public void changeNickname(Long userId, String nickname){
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(()-> new RuntimeException("유저를 찾을 수 없습니다."));
+
+        user.setNickname(nickname);
     }
 }

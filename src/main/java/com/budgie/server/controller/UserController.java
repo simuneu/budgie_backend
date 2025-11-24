@@ -1,5 +1,6 @@
 package com.budgie.server.controller;
 
+import com.budgie.server.dto.NicknameChangeRequestDto;
 import com.budgie.server.dto.PasswordChangeRequestDto;
 import com.budgie.server.dto.UserInfoDto;
 import com.budgie.server.entity.UserEntity;
@@ -40,5 +41,14 @@ public class UserController {
         Long userId = Long.parseLong(principal.getName());
         userService.changePassword(userId, dto);
         return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+    }
+
+    //닉네입 변경
+    @PutMapping("/nickname")
+    public ResponseEntity<?> changeNickname(Principal principal, @RequestBody NicknameChangeRequestDto dto){
+        Long userId = Long.parseLong(principal.getName());
+        userService.changeNickname(userId, dto.getNickname());
+
+        return ResponseEntity.ok("닉네임이 변경되었습니다.");
     }
 }
