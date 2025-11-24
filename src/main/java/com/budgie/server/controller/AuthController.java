@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -225,5 +226,17 @@ public class AuthController {
         authService.deleteAccount(userId, dto.getPassword());
 
         return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+    }
+
+    //탈퇴 검증
+    @PostMapping("/check-password")
+    public ResponseEntity<?> checkPassword(Principal principal, @RequestBody DeleteAccountRequestDto dto){
+        Long userId = Long.parseLong(principal.getName());
+
+        boolean matches = authService.checkPassword(userId, dto.getPassword());
+        if(!matches){
+            return ResponseEntity.status(400).body("비밀번호가 일치하지 않습니다.");
+        }
+        return ResponseEntity.ok("탈퇴 고!");
     }
 }

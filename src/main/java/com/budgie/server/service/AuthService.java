@@ -263,4 +263,12 @@ public class AuthService {
 
         log.info("소프트 딜리트 완료 userId:{}", userId);
     }
+
+    //탈퇴 검증
+    public boolean checkPassword(Long userId, String password){
+        UserEntity user = authRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+
+        return passwordEncoder.matches(password, user.getPassword());
+    }
 }
