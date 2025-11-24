@@ -207,4 +207,10 @@ public class AuthController {
         return ResponseEntity.ok("logout success");
     }
 
+    //비밀번호 재설정(임시비번)
+    @PostMapping("/password/reset-request")
+    public ResponseEntity<?> requestPasswordReset(@RequestParam String email){
+        authService.setPasswordResetCode(email);
+        return ResponseEntity.ok("리셋 코드 전송 완료");
+    }
 }

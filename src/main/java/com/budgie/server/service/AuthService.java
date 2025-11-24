@@ -213,4 +213,18 @@ public class AuthService {
                 .grantType(jwtProvider.getGrantType())
                 .build();
     }
+
+    //비밀번호 재설정
+    @Transactional
+    public void setPasswordResetCode(String email){
+        UserEntity user = authRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("가입되지 않은 이메일입니다."));
+
+        String resetCode = emailService.createVerificationCode();
+
+        emailVerificationService.saveVerificationCode(email, resetCode);
+
+        emailService.sendPasswordResetEmail(email, resetCode);
+        log.info("비밀번호 재설정 코드 발송 완료: {}", email);
+    }
 }
