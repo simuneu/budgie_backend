@@ -2,6 +2,7 @@ package com.budgie.server.service;
 
 import com.budgie.server.dto.AuthResponseDto;
 import com.budgie.server.dto.LoginRequestDto;
+import com.budgie.server.dto.PasswordResetRequest;
 import com.budgie.server.dto.UserSignupRequestDto;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.enums.UserStatus;
@@ -226,5 +227,28 @@ public class AuthService {
 
         emailService.sendPasswordResetEmail(email, resetCode);
         log.info("비밀번호 재설정 코드 발송 완료: {}", email);
+    }
+
+    //비번 코드 검증
+    @Transactional
+    public void resetPassword(PasswordResetRequest dto){
+        String email = dto.getEmail();
+        String code = dto.getCode();
+        String newPassword = dto.getNewPassword();
+
+        emailVerificationService.verifyCode(email, code);
+
+        //유저조회
+        UserEntity user = authRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("가입되지 않은 이메일입니다."));
+
+        //비밀번호 형식 검사
+        if(!newPassword.matches(PASSWORD_REGEX)){
+            throw new RuntimeException("비밀번호는 영문, 숫자, 특수문자 포함 8자리 이상이어야 합니다.");
+        }
+
+        //변경
+        user.setPassword(passwordEncoder.encode(newPassword));
+        log.info("비밀번호 재설정 완료: {}", email);
     }
 }

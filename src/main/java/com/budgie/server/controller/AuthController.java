@@ -213,4 +213,11 @@ public class AuthController {
         authService.setPasswordResetCode(email);
         return ResponseEntity.ok("리셋 코드 전송 완료");
     }
+
+    //비밀번호 재설정 완료
+    @PostMapping("/password/reset")
+    public ResponseEntity<?> resetPassword(@RequestParam PasswordResetRequest dto){
+        authService.resetPassword(dto);
+        return ResponseEntity.ok("비번 재설정 완료");
+    }
 }
