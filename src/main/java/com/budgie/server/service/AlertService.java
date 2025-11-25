@@ -22,10 +22,10 @@ public class AlertService {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1);
 
-        boolean exists = alertRepository.existsByUserIdAndTypeAndCreatedAtBetween(
-                userId, type, startOfDay, endOfDay);
-        log.info("EXISTS? {}", exists);
-        if(exists) return; //이미 보냈으면 안 보냄
+//        boolean exists = alertRepository.existsByUserIdAndTypeAndCreatedAtBetween(
+//                userId, type, startOfDay, endOfDay);
+//        log.info("EXISTS? {}", exists);
+//        if(exists) return; //이미 보냈으면 안 보냄
 
         AlertEntity alert = AlertEntity.builder()
                 .userId(userId)

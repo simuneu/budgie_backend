@@ -4,9 +4,11 @@ import com.budgie.server.dto.*;
 import com.budgie.server.entity.CategoryEntity;
 import com.budgie.server.entity.TransactionEntity;
 import com.budgie.server.entity.UserEntity;
+import com.budgie.server.enums.AlertType;
 import com.budgie.server.mapper.TransactionMapper;
 import com.budgie.server.repository.CategoryRepository;
 import com.budgie.server.repository.TransactionRepository;
+import com.budgie.server.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,12 @@ import java.util.stream.Collectors;
 public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
+
+    private final AnalysisService analysisService;
+    private final AlertService alertService;
+    private final FcmService fcmService;
+    private final UserRepository userRepository;
+
 
     //내역 가져오기
     public List<TransactionDto> getTransactions(UserEntity user){
@@ -54,7 +62,48 @@ public class TransactionService {
     //소비, 지출 내역 만들기(생성하기)
     public TransactionDto createTransaction(TransactionEntity transaction){
         TransactionEntity saved = transactionRepository.save(transaction);
+
+        //알림 로직
+        Long userId = saved.getUser().getUserId();
+        int year = saved.getTransactionDate().getYear();
+        int month = saved.getTransactionDate().getMonthValue();
+
+        //분석데이터 가져오기
+        SpendingPaceResponseDto pace = analysisService.getSpendingPace(userId, year, month);
+
+        long used = pace.getTotalExpense();
+        long goal = pace.getBudgetGoal();
+
+        if (goal > 0) {
+            int rate = analysisService.calculateUsageRate(used, goal);
+
+            if (rate >= 70 && rate < 80) {
+                sendPercentAlert(userId, 70);
+            } else if (rate >= 80 && rate < 90) {
+                sendPercentAlert(userId, 80);
+            } else if (rate >= 90 && rate < 100) {
+                sendPercentAlert(userId, 90);
+            }
+        }
+
         return TransactionMapper.toDto(saved);
+    }
+
+    private void sendPercentAlert(Long userId, int percent){
+        String message = "🔥 이번 달 예산의 " + percent + "%를 사용했어요! 지출 조절이 필요해요!!";
+
+        // DB 저장
+        alertService.createAlert(userId, AlertType.BUDGET_DANGER, message);
+
+        // FCM 발송
+        UserEntity user = userRepository.findById(userId).orElse(null);
+        if (user != null && user.getFcmToken() != null) {
+            fcmService.send(
+                    user.getFcmToken(),
+                    "예산 " + percent + "% 사용",
+                    message
+            );
+        }
     }
 
     //소비, 지출 내역 수정하기
@@ -76,6 +125,26 @@ public class TransactionService {
         existing.setAmount(updated.getAmount());
         existing.setMemo(updated.getMemo());
         existing.setTransactionDate(updated.getTransactionDate());
+
+        Long userId = existing.getUser().getUserId();
+        int year = existing.getTransactionDate().getYear();
+        int month = existing.getTransactionDate().getMonthValue();
+
+        SpendingPaceResponseDto pace = analysisService.getSpendingPace(userId, year, month);
+        long used = pace.getTotalExpense();
+        long goal = pace.getBudgetGoal();
+
+        if (goal > 0) {
+            int rate = analysisService.calculateUsageRate(used, goal);
+
+            if (rate >= 70 && rate < 80) {
+                sendPercentAlert(userId, 70);
+            } else if (rate >= 80 && rate < 90) {
+                sendPercentAlert(userId, 80);
+            } else if (rate >= 90 && rate < 100) {
+                sendPercentAlert(userId, 90);
+            }
+        }
 
         return TransactionMapper.toDto(existing);
     }
@@ -105,5 +174,6 @@ public class TransactionService {
         return transactionRepository.findRecordedDays(year, month, userId);
     }
 
+    //
 
 }
