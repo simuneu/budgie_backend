@@ -35,5 +35,6 @@ public interface AlertRepository extends JpaRepository<AlertEntity, Long> {
                            LocalDateTime start,
                            LocalDateTime end);
 
+    void deleteByUserId(Long userId);
 
 }

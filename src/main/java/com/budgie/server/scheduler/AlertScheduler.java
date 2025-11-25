@@ -52,7 +52,7 @@ public class AlertScheduler {
 
             //위헙도 알림
             if ("HIGH".equals(pace.getDangerLevel())) {
-                String message = "이번 달 지출 속도가 너무 빨라요! 예산을 초과하기 일보직전이에요!!";
+                String message = "이번 달 지출 속도가 너무 빨라요!\n예산을 초과하기 일보직전이에요!!";
 
                 alertService.createAlert(userId, AlertType.BUDGET_DANGER, message);
 

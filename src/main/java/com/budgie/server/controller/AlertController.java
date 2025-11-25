@@ -6,7 +6,9 @@ import com.budgie.server.service.AlertService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.parameters.P;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -58,6 +60,14 @@ public class AlertController {
     public ResponseEntity<?> getUnreadCount(Principal principal){
         Long userId = Long.parseLong(principal.getName());
         return ResponseEntity.ok(alertService.getUnreadCount(userId));
+    }
+
+    //알림 지우기
+    @DeleteMapping("/{alertId}")
+    public ResponseEntity<?> deleteAlert(@PathVariable Long alertId, Principal principal){
+        Long userId = Long.parseLong(principal.getName());
+        alertService.deleteAlert(userId,alertId);
+        return ResponseEntity.ok().build();
     }
 }
 

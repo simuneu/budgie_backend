@@ -66,4 +66,15 @@ public class AlertService {
     public int getUnreadCount(Long userId){
         return alertRepository.countByUserIdAndIsReadFalse(userId);
     }
+
+    //알림 지우기
+    public void deleteAlert(Long userId, Long alertId){
+        AlertEntity alert = alertRepository.findById(alertId)
+                .orElseThrow(() -> new IllegalArgumentException("알림을 찾을 수 없음"));
+
+        if(!alert.getUserId().equals(userId)){
+            throw new RuntimeException("삭제 권한 없음");
+        }
+        alertRepository.delete(alert);
+    }
 }
