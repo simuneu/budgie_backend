@@ -1,69 +1,71 @@
-# 🐤 Budgie — 개인 가계부 & 소비 분석 웹 앱
+# 🐥 BUDGIE — 개인 가계부 & 소비 분석 웹 앱
 Budgie는 사용자의 소비 기록을 기반으로
-예산 관리, 소비 패턴 분석, 실시간 FCM 알림 기능을 제공하는
+예산 관리, 소비 패턴 분석, 실시간 FCM 알림 기능을 제공하는 <br/>
 1인 프로젝트 가계부 웹 애플리케이션입니다.
 
-번거롭게 직접 계산하지 않아도 과지출을 하지 않도록 누군가가 도와줬으면 좋겠다는 아이디어에서 BUDGIE가 시작되었습니다.
-“위험한 소비 패턴을 미리 알려주는 친구”가 되는 것이 목표입니다.
+번거롭게 직접 계산하지 않아도 과지출을 하지 않도록 누군가가 도와줬으면 좋겠다는 아이디어에서 시작되었습니다.<br/>
+“위험한 소비 패턴을 미리 알려주는 친구”가 되는 것이 목표입니다.<br/>
 ## 👇배포 주소와 테스트 계정 
-https://www.budgie.fit/
-ID: dino507782@gmail.com
+https://www.budgie.fit/<br/>
+ID: dino507782@gmail.com<br/>
 PW: abcd1234!
 ## 🎬 주요 화면 미리보기
 ## ✨ 주요 기능
-🔐 인증 & 보안
+## ✨ 주요 기능
 
-이메일 회원가입 / 로그인
-소셜 로그인 (네이버, 카카오)
-JWT Access & Refresh Token
+<details>
+<summary>🔐 인증 & 보안</summary>
 
-Redis 기반 Refresh Token 관리
+- 이메일 회원가입 / 로그인
+- 소셜 로그인 (네이버, 카카오)
+- JWT Access & Refresh Token
+- Redis 기반 Refresh Token 관리
+- 비밀번호 변경 / 로그아웃
 
-비밀번호 변경 / 로그아웃
+</details>
 
-💰 가계부 기능
+<details>
+<summary>💰 가계부 기능</summary>
 
-월별 지출 관리
+- 월별 지출 관리
+- 카테고리별 통계 (파이 차트)
+- 날짜별 지출 달력
+- 지출 내역 CRUD
+- 예산 설정 & 예산 대비 % 계산
 
-카테고리별 통계 (파이 차트)
+</details>
 
-날짜별 지출 달력
+<details>
+<summary>📊 소비 패턴 분석</summary>
 
-지출 내역 CRUD
+- 요일별 소비 패턴
+- 월별 카테고리 TOP3
+- 지난달 대비 지출 증감률
+- 일 단위 누적 소비 그래프
 
-예산 설정 & 예산 대비 % 계산
+</details>
 
-📊 소비 패턴 분석
+<details>
+<summary>🔔 FCM Push 알림</summary>
 
-요일별 소비 패턴
+- 예산 70% / 80% / 90% 도달 시 자동 알림
+- 지출 속도 분석 기반 위험 알림
+- 스케줄러(9/12/14/18/22시) 기반 자동 분석 + 발송
+- 알림 읽음 처리, 삭제 기능
 
-월별 카테고리 TOP3
+</details>
 
-지난달 대비 지출 증감률
+<details>
+<summary>🌐 배포 인프라</summary>
 
-일 단위 누적 소비 그래프
+- AWS EC2 (Ubuntu)
+- Nginx + HTTPS (Certbot)
+- MySQL 8.0
+- Redis (Docker)
+- Firebase Cloud Messaging
 
-🔔 FCM Push 알림
+</details>
 
-예산 70% / 80% / 90% 도달 시 자동 알림
-
-지출 속도 분석 기반 위험 알림
-
-스케줄러(9/12/14/18/22시)에 의해 자동 분석 및 발송
-
-알림 읽음 처리, 삭제 기능
-
-🌐 배포 인프라
-
-AWS EC2 (Ubuntu)
-
-Nginx + HTTPS (Certbot)
-
-MySQL 8.0
-
-Redis (Docker)
-
-Firebase Cloud Messaging
 
 ## 👉기술 스택
 ### 🛠 Backend
