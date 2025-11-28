@@ -6,11 +6,31 @@ Budgie는 사용자의 소비 기록을 기반으로
 번거롭게 직접 계산하지 않아도 과지출을 하지 않도록 누군가가 도와줬으면 좋겠다는 아이디어에서 시작되었습니다.<br/>
 “위험한 소비 패턴을 미리 알려주는 친구”가 되는 것이 목표입니다.<br/>
 ## 👇배포 주소와 테스트 계정 
-https://www.budgie.fit/<br/>
+https://www.budgie.fit<br/>
 ID: dino507782@gmail.com<br/>
 PW: abcd1234!
 ## 🎬 주요 화면 미리보기
-## ✨ 주요 기능
+#### 🔐 로그인 및 로그아웃 (모바일)
+<p align="center">
+  <img src="./assets/gifs/login-logout.gif" width="260" />
+</p>
+
+#### 💰 목표 금액 수정 & 지출 관리 (CRUD)
+<p align="center">
+  <img src="./assets/gifs/goal-modify.gif" width="260" />
+  <img src="./assets/gifs/crud.gif" width="480" />
+</p>
+
+#### 📊 통계 & 소비 분석
+<p align="center">
+  <img src="./assets/gifs/statistics.gif" width="480" />
+  <img src="./assets/gifs/graph.gif" width="480" />
+</p>
+
+#### 🔔 실시간 FCM 알림 (읽기/삭제/전체 읽음)
+<p align="center">
+  <img src="./assets/gifs/alert.gif" width="260" />
+</p>
 ## ✨ 주요 기능
 
 <details>
