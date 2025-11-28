@@ -119,7 +119,26 @@ public class JwtProvider {
 
     //토큰 유효성 검증(서명/만료)
     public boolean validateToken(String token){
-        return validateAndGetUserId(token) != null;
+        try{
+            Claims claims = getParser()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            log.info("토큰 검증 성공, 사용자 id: {}", claims.getSubject());
+            return true;
+        }catch (ExpiredJwtException e){
+            log.warn("만료된 토큰:{}", e.getMessage());
+            throw e;
+        }catch (SecurityException | MalformedJwtException e){
+            log.error("유효하지 않은 토큰:{}", e.getMessage());
+        }catch (UnsupportedJwtException e){
+            log.error("지원되지 않는 토큰:{}", e.getMessage());
+        }catch (IllegalArgumentException e){
+            log.error("jwt클레임 문자열이 비어있음:{}", e.getMessage());
+        }
+
+        log.warn("토큰 검증 실패");
+        return false;
+
     }
 
     //토큰에서 userId추출 후 객체 생성
