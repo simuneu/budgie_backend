@@ -31,6 +31,7 @@ PW: abcd1234!
 <p align="center">
   <img src="./assets/gifs/alert.gif" width="260" />
 </p>
+
 ## ✨ 주요 기능
 
 <details>
