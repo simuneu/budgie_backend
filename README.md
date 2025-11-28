@@ -125,7 +125,7 @@ PW: abcd1234!
 <summary>🏛 시스템 아키텍처</summary>
 
 <div align="center">
-  <img src="./assets/images/system.png" width="480" />
+  <img src="./assets/images/system.png" width="720" />
 </div>
 
 </details>
@@ -136,7 +136,7 @@ PW: abcd1234!
 <summary>🚀 배포 아키텍처</summary>
 
 <div align="center">
-  <img src="./assets/images/deployment.png" width="480" />
+  <img src="./assets/images/deployment.png" width="720" />
 </div>
 
 </details>
@@ -147,7 +147,7 @@ PW: abcd1234!
 <summary>🗂 ERD</summary>
 
 <div align="center">
-  <img src="./assets/images/erd.jpg" width="480" />
+  <img src="./assets/images/erd.jpg" width="720" />
 </div>
 
 </details>
