@@ -120,11 +120,35 @@ PW: abcd1234!
 ![GitHub](https://img.shields.io/badge/GitHub-181717.svg?logo=github&logoColor=white)
 
 
-## 🏛 시스템 아키텍처
+<details>
+<summary>🏛 시스템 아키텍처</summary>
+
+<div align="center">
   <img src="./assets/images/system.png" width="480" />
+</div>
 
-## 🏛 배포 아키텍처
+</details>
+
+---
+
+<details>
+<summary>🚀 배포 아키텍처</summary>
+
+<div align="center">
   <img src="./assets/images/deployment.png" width="480" />
+</div>
 
-## ERD
+</details>
+
+---
+
+<details>
+<summary>🗂 ERD</summary>
+
+<div align="center">
+  <img src="./assets/images/erd.jpg" width="480" />
+</div>
+
+</details>
+
 
