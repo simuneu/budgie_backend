@@ -121,6 +121,10 @@ PW: abcd1234!
 
 
 ## 🏛 시스템 아키텍처
+  <img src="./assets/images/system.png" width="480" />
+
+## 🏛 배포 아키텍처
+  <img src="./assets/images/deployment.png" width="480" />
 
 ## ERD
 
