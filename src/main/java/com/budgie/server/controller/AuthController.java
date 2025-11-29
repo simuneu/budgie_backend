@@ -6,6 +6,7 @@ import com.budgie.server.security.JwtProvider;
 import com.budgie.server.service.AuthService;
 import com.budgie.server.service.NaverLoginService;
 import com.budgie.server.service.SocialLoginService;
+import com.google.api.Http;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
@@ -73,10 +75,22 @@ public class AuthController {
 
     //로그인
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto requestDto){
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto requestDto, HttpServletResponse response){
         try{
             AuthResponseDto responseDto   = authService.login(requestDto);
-            return ResponseEntity.ok().body(responseDto);
+            ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", responseDto.getRefreshToken())
+                    .httpOnly(true)
+                    .secure(true)
+                    .sameSite("None")
+                    .path("/")
+                    .maxAge(jwtProvider.getRefreshTokenExpirationSeconds())
+                    .build();
+            response.addHeader("Set-Cookie", refreshCookie.toString());
+
+            return ResponseEntity.ok(Map.of(
+                    "accessToken", responseDto.getAccessToken(),
+                    "grantType", responseDto.getGrantType()
+            ));
         }catch (Exception e){
             ResponseDto responseDto = ResponseDto.builder()
                     .error(e.getMessage())
@@ -180,19 +194,31 @@ public class AuthController {
 
     //토큰 갱신 refresh기반 access재발급
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshAccessToken(@RequestBody Map<String, String>body){
-        String refreshToken = body.get("refreshToken");
+    public ResponseEntity<?> refreshAccessToken(@CookieValue(value = "refreshToken", required = false) String refreshToken,
+                                                HttpServletResponse response){
 
         if(refreshToken == null || refreshToken.isBlank()){
-            return ResponseEntity.badRequest().body("refreshToken이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("refreshToken이 없습니다.");
         }
 
         try{
             AuthResponseDto newToken = authService.refreshAccessToken(refreshToken);
-            return ResponseEntity.ok(newToken);
-        } catch (RuntimeException e) {
-            log.warn("토큰 갱신 실패"+e.getMessage());
-            //401/403
+
+            ResponseCookie newCookie = ResponseCookie.from("refreshToken", newToken.getRefreshToken())
+                    .httpOnly(true)
+                    .secure(true)
+                    .sameSite("None")
+                    .path("/")
+                    .maxAge(jwtProvider.getRefreshTokenExpirationSeconds())
+                    .build();
+
+            response.addHeader("Set-Cookie", newCookie.toString());
+
+            return ResponseEntity.ok(Map.of(
+                    "accessToken", newToken.getAccessToken(),
+                    "grantType", newToken.getGrantType()
+            ));
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
