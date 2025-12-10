@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
@@ -59,6 +58,7 @@ public class TransactionService {
     }
 
     //소비, 지출 내역 만들기(생성하기)
+    @Transactional
     public TransactionDto createTransaction(TransactionEntity transaction){
         TransactionEntity saved = transactionRepository.save(transaction);
 
@@ -106,6 +106,7 @@ public class TransactionService {
     }
 
     //소비, 지출 내역 수정하기
+    @Transactional
     public TransactionDto updateTransaction(Long transactionId, TransactionEntity updated){
         TransactionEntity existing = transactionRepository.findById(transactionId)
                 .orElseThrow(()->new IllegalArgumentException("내역을 찾을 수 없습니다."));
@@ -149,6 +150,7 @@ public class TransactionService {
     }
 
     //삭제
+    @Transactional
     public void deletedTransaction(Long transactionId){
         transactionRepository.deleteById(transactionId);
     }
@@ -168,11 +170,10 @@ public class TransactionService {
         return transactionRepository.getMonthlyIncomeSummary(userId, year, month);
     }
 
-    //기록한 낳 조회
+    //기록한 날 조회
     public List<RecordedDayDto> getRecordedDays(int year, int month, Long userId){
         return transactionRepository.findRecordedDays(year, month, userId);
     }
 
-    //
 
 }
