@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,7 +28,7 @@ public class AlertScheduler {
     @Scheduled(cron = "0 0 9,12,14,18,22 * * *")
 //    @Scheduled(cron = "0 0 9 * * *") //초 분 시 일 월 요일 - 9시
     public void runDailyAlertCheck() {
-        log.info("AlertScheduler : 매일 체크를 시작");
+        log.debug("AlertScheduler : 매일 체크를 시작");
 
         List<UserEntity> users = userRepository.findAll();
 
@@ -63,7 +62,7 @@ public class AlertScheduler {
                             message
                     );
                 }
-                log.info("user {}: 예산 초과 위험 알림 전송", userId);
+                log.debug("user {}: 예산 초과 위험 알림 전송", userId);
             }
         }//for
     }

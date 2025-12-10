@@ -6,7 +6,6 @@ import com.budgie.server.security.JwtProvider;
 import com.budgie.server.service.AuthService;
 import com.budgie.server.service.NaverLoginService;
 import com.budgie.server.service.SocialLoginService;
-import com.google.api.Http;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -106,7 +104,7 @@ public class AuthController {
                 "?client_id=" + kakaoClientId +
                 "&redirect_uri=" + kakaoRedirectUri +
                 "&response_type=code";
-        log.info("카카오 로그인 리다이렉트: {}", kakaoAuthUrl);
+        log.debug("카카오 로그인 리다이렉트: {}", kakaoAuthUrl);
         return new RedirectView(kakaoAuthUrl);
     }
 
@@ -171,26 +169,6 @@ public class AuthController {
         }
     }
 
-
-    //로그아웃
-//    @PostMapping("/logout")
-//    public ResponseEntity<?> logoutUser(@RequestBody LogoutRequestDto requestDto){
-//        Long userId = requestDto.getUserId();
-//        try{
-//            log.info("로그아웃 요청 수신. userId:{}", userId);
-//            authService.logout(userId);
-//            ResponseDto responseDto = ResponseDto.builder()
-//                    .message("로그아웃 성공")
-//                    .build();
-//            return ResponseEntity.ok().body(responseDto);
-//        }catch (Exception e){
-//            log.error("로그아웃 중 오류 발생 :"+e.getMessage());
-//            ResponseDto responseDto = ResponseDto.builder()
-//                    .error("로그아웃 처리 실패: " + e.getMessage())
-//                    .build();
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDto);
-//        }
-//    }
 
     //토큰 갱신 refresh기반 access재발급
     @PostMapping("/refresh")

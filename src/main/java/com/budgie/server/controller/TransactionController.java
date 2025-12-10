@@ -1,18 +1,14 @@
 package com.budgie.server.controller;
 
-import com.budgie.server.dto.CategorySummaryDto;
 import com.budgie.server.dto.RecordedDayDto;
-import com.budgie.server.dto.TopCategoryDto;
 import com.budgie.server.dto.TransactionDto;
 import com.budgie.server.entity.CategoryEntity;
 import com.budgie.server.entity.TransactionEntity;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.mapper.TransactionMapper;
 import com.budgie.server.repository.CategoryRepository;
-import com.budgie.server.security.CustomUserDetailsService;
 import com.budgie.server.service.TransactionService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Transaction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;

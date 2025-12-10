@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -25,8 +24,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        log.info("AUTH HEADER = {}", request.getHeader("Authorization"));
-        log.info("REQUEST URI = {}", request.getRequestURI());
+        log.debug("AUTH HEADER = {}", request.getHeader("Authorization"));
+        log.debug("REQUEST URI = {}", request.getRequestURI());
 
         String header = request.getHeader("Authorization");
 
@@ -34,8 +33,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if(header != null && header.startsWith("Bearer ")){
             String token = header.substring(7);
 
-            log.info("######## 요청 URI: {}", request.getRequestURI());
-            log.info("########추출된 토큰: {}", token);
+            log.debug("######## 요청 URI: {}", request.getRequestURI());
+            log.debug("########추출된 토큰: {}", token);
 
             try {
             if(jwtProvider.validateToken(token)){

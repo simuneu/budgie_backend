@@ -4,7 +4,6 @@ import com.budgie.server.dto.PasswordChangeRequestDto;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

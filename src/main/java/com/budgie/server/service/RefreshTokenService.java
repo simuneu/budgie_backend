@@ -6,7 +6,6 @@ import com.budgie.server.repository.RefreshTokenRepository;
 import com.budgie.server.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -42,14 +41,14 @@ public class RefreshTokenService {
         String redisKey = "refresh_token:" +userId;
         redisTemplate.opsForValue().set(redisKey, refreshToken, ttlSeconds, TimeUnit.SECONDS);
 
-        log.info("Refresh Token저장 완료. userId={}, TTL={}초", userId, ttlSeconds);
+        log.debug("Refresh Token저장 완료. userId={}, TTL={}초", userId, ttlSeconds);
     }
 
     //삭제
     public boolean deletedRefreshToken(Long userId) {
         if (refreshTokenRepository.existsById(userId)) {
             refreshTokenRepository.deleteById(userId);
-            log.info("로그아웃 성공, refresh token 삭제 완료. userId:{}", userId);
+            log.debug("로그아웃 성공, refresh token 삭제 완료. userId:{}", userId);
             return true;
         } else {
             log.warn("로그아웃 실패: refresh token이 존재하지 않거나 삭제 오류:{}", userId);
@@ -90,7 +89,7 @@ public class RefreshTokenService {
 
         String redisKey = "refresh_token:" + userId;
         redisTemplate.opsForValue().set(redisKey, refreshToken, ttlSeconds, TimeUnit.SECONDS);
-        log.info("Refresh Token 저장/갱신 완료. user={}, TTL={}초", user.getEmail(), ttlSeconds);
+        log.debug("Refresh Token 저장/갱신 완료. user={}, TTL={}초", user.getEmail(), ttlSeconds);
 
     }
 
@@ -107,7 +106,7 @@ public class RefreshTokenService {
     public void deleteByUserId(Long userId) {
         if (refreshTokenRepository.existsById(userId)) {
             refreshTokenRepository.deleteById(userId);
-            log.info("리프레시 토큰을 성공적으로 삭제: {}", userId);
+            log.debug("리프레시 토큰을 성공적으로 삭제: {}", userId);
         } else {
             log.warn("refresh token을 삭제하는데 실패: {}", userId);
         }

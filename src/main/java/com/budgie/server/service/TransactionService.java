@@ -10,7 +10,6 @@ import com.budgie.server.repository.CategoryRepository;
 import com.budgie.server.repository.TransactionRepository;
 import com.budgie.server.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

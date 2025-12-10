@@ -1,14 +1,10 @@
 package com.budgie.server.service;
 
-import com.budgie.server.dto.TopCategoryDto;
 import com.budgie.server.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -29,7 +25,7 @@ public class TokenService {
             expireTime,
             TimeUnit.MILLISECONDS
         );
-        log.info("redis에 refresh token 저장 완료 userId={},TTL={}ms", userId, expireTime );
+        log.debug("redis에 refresh token 저장 완료 userId={},TTL={}ms", userId, expireTime );
     }
 
     //refresh token 조회
@@ -41,7 +37,7 @@ public class TokenService {
     //refresh token삭제
     public void deleteRefreshToken(Long userId){
         redisTemplate.delete(PREFIX+userId);
-        log.info("redis에서 refreshToken삭제, userId={}", userId);
+        log.debug("redis에서 refreshToken삭제, userId={}", userId);
     }
 
     //refresh token일치 여부 확인

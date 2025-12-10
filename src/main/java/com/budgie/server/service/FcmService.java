@@ -33,7 +33,7 @@ public class FcmService {
 
         try{
             String response = FirebaseMessaging.getInstance().send(message);
-            log.info("fcm 성공적으로 보내졌습니다. :{}", response);
+            log.debug("fcm 성공적으로 보내졌습니다. :{}", response);
         }catch (Exception e){
             log.error("fcm error:{}", e.getMessage() ,e);
         }

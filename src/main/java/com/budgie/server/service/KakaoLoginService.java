@@ -26,8 +26,8 @@ public class KakaoLoginService {
     public KakaoTokenResponseDto getKakaoAccessToken(String code){
         String KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
 
-        log.info(" 카카오 토큰 요청 시작 — 인가 코드 = {}", code);
-        log.info(" redirect_uri = {}", redirectUri);
+        log.debug(" 카카오 토큰 요청 시작 — 인가 코드 = {}", code);
+        log.debug(" redirect_uri = {}", redirectUri);
 
         //헤더
         HttpHeaders headers = new HttpHeaders();
@@ -39,7 +39,7 @@ public class KakaoLoginService {
         body.add("redirect_uri", redirectUri);
         body.add("code", code);
 
-        log.info(" 카카오 토큰 요청 Body = {}", body);
+        log.debug(" 카카오 토큰 요청 Body = {}", body);
 
         //http entity
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
@@ -50,10 +50,10 @@ public class KakaoLoginService {
                 request,
                 KakaoTokenResponseDto.class
         );
-        log.info(" 카카오 토큰 RAW 응답 = {}", response);
+        log.debug(" 카카오 토큰 RAW 응답 = {}", response);
         if(response.getStatusCode().is2xxSuccessful() && response.getBody() != null){
-            log.info(" 카카오 accessToken = {}", response.getBody().getAccessToken());
-            log.info(" 카카오 refreshToken = {}", response.getBody().getRefreshToken());
+            log.debug(" 카카오 accessToken = {}", response.getBody().getAccessToken());
+            log.debug(" 카카오 refreshToken = {}", response.getBody().getRefreshToken());
             return response.getBody();
         }
         throw new RuntimeException("카카오 access token 획득 실패"+response.getStatusCode());
@@ -61,7 +61,7 @@ public class KakaoLoginService {
 
     public KakaoUserInfoResponseDto getKakaoUserInfo(String kakaoAccessToken){
         String KAKAO_USER_INFO_URL = "https://kapi.kakao.com/v2/user/me";
-        log.info(" 카카오 유저 정보 요청 AccessToken = {}", kakaoAccessToken);
+        log.debug(" 카카오 유저 정보 요청 AccessToken = {}", kakaoAccessToken);
 
         //헤더 설정
         HttpHeaders headers = new HttpHeaders();
@@ -77,10 +77,10 @@ public class KakaoLoginService {
                 entity,
                 KakaoUserInfoResponseDto.class
         );
-        log.info(" 카카오 유저 정보 RAW 응답 = {}", response);
+        log.debug(" 카카오 유저 정보 RAW 응답 = {}", response);
 
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-            log.info(" 카카오 유저 정보 획득 성공 userId = {}", response.getBody().getId());
+            log.debug(" 카카오 유저 정보 획득 성공 userId = {}", response.getBody().getId());
             return response.getBody();
         }
         throw new RuntimeException("카카오 사용자 정보 획득 실패");

@@ -83,7 +83,7 @@ public class JwtProvider {
                   .setIssuedAt(now)
                   .setExpiration(expiration)
                   .compact();
-          log.info("리프레시 토큰이 성공적으로 생성됨:{}", userId);
+          log.debug("리프레시 토큰이 성공적으로 생성됨:{}", userId);
           return token;
        }catch (Exception e){
            log.error("리프레시 토큰을 생성하는 데 실패함 {} 이유는: {}", userId, e.getMessage(), e);
@@ -102,7 +102,7 @@ public class JwtProvider {
             Claims claims = getParser()
                     .parseSignedClaims(token)
                     .getPayload();
-            log.info("토큰 검증 성공, 사용자 id:{}", claims.getSubject());
+            log.debug("토큰 검증 성공, 사용자 id:{}", claims.getSubject());
             return claims.getSubject();
         }catch (SecurityException | MalformedJwtException e ) {
             log.error("유효하지 않은 JWT 서명: {}", e.getMessage());
@@ -123,7 +123,7 @@ public class JwtProvider {
             Claims claims = getParser()
                     .parseSignedClaims(token)
                     .getPayload();
-            log.info("토큰 검증 성공, 사용자 id: {}", claims.getSubject());
+            log.debug("토큰 검증 성공, 사용자 id: {}", claims.getSubject());
             return true;
         }catch (ExpiredJwtException e){
             log.warn("만료된 토큰:{}", e.getMessage());

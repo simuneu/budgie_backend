@@ -10,8 +10,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -26,7 +24,7 @@ public class SocialLoginService {
 
     @Transactional
     public AuthResponseDto kakaoLogin(String code){
-        log.info("카카오 로그인 요청 코드 수신:{}", code);
+        log.debug("카카오 로그인 요청 코드 수신:{}", code);
         KakaoTokenResponseDto kakaoToken = kakaoLoginService.getKakaoAccessToken(code);
         KakaoUserInfoResponseDto userInfo = kakaoLoginService.getKakaoUserInfo(kakaoToken.getAccessToken());
 

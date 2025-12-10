@@ -5,7 +5,6 @@ import com.budgie.server.dto.DailyExpenseDto;
 import com.budgie.server.dto.TopCategoryDto;
 import com.budgie.server.dto.WeeklyExpenseDto;
 import com.budgie.server.service.StatisticsService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

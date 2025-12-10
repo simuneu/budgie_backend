@@ -14,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -169,7 +168,7 @@ public class AuthService {
     @Transactional
     public void logout(Long userId){
         if(refreshTokenService.deletedRefreshToken(userId)){
-            log.info("로그아웃 성공, refresh token 삭제 완료. userId:{}", userId);
+            log.debug("로그아웃 성공, refresh token 삭제 완료. userId:{}", userId);
         }else{
             log.warn("로그아웃 실패:refresh token이 존재하지 않거나 삭제 오류:{}", userId);
         }
@@ -217,7 +216,7 @@ public class AuthService {
         emailVerificationService.saveVerificationCode(email, resetCode);
 
         emailService.sendPasswordResetEmail(email, resetCode);
-        log.info("비밀번호 재설정 코드 발송 완료: {}", email);
+        log.debug("비밀번호 재설정 코드 발송 완료: {}", email);
     }
 
     //비번 코드 검증
@@ -240,7 +239,7 @@ public class AuthService {
 
         //변경
         user.setPassword(passwordEncoder.encode(newPassword));
-        log.info("비밀번호 재설정 완료: {}", email);
+        log.debug("비밀번호 재설정 완료: {}", email);
     }
 
     //탈퇴
@@ -261,7 +260,7 @@ public class AuthService {
         user.setUserStatus(UserStatus.N);
         user.setDeletedAt(LocalDateTime.now());
 
-        log.info("소프트 딜리트 완료 userId:{}", userId);
+        log.debug("소프트 딜리트 완료 userId:{}", userId);
     }
 
     //탈퇴 검증

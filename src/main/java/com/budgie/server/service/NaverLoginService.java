@@ -34,8 +34,8 @@ public class NaverLoginService {
 
     public NaverTokenResponseDto getNaverAccessToken(String code, String state){
 
-        log.info("네이버 토큰 요청 시작: code={}, state={}", code, state);
-        log.info(" 네이버 redirect_uri = {}", redirectUri);
+        log.debug("네이버 토큰 요청 시작: code={}, state={}", code, state);
+        log.debug(" 네이버 redirect_uri = {}", redirectUri);
 
         //헤더
         HttpHeaders headers = new HttpHeaders();
@@ -49,7 +49,7 @@ public class NaverLoginService {
         body.add("code", code);
         body.add("state", state);
 
-        log.info(" 네이버 토큰 요청 Body = {}", body);
+        log.debug(" 네이버 토큰 요청 Body = {}", body);
 
         //http entity
         HttpEntity<MultiValueMap<String, String>>request = new HttpEntity<>(body, headers);
@@ -61,16 +61,16 @@ public class NaverLoginService {
                 NaverTokenResponseDto.class
         );
 
-        log.info(" 네이버 토큰 RAW 응답 = {}", response);
+        log.debug(" 네이버 토큰 RAW 응답 = {}", response);
 
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-            log.info(" 네이버 accessToken = {}", response.getBody().getAccessToken());
+            log.debug(" 네이버 accessToken = {}", response.getBody().getAccessToken());
             return response.getBody();
         }
         throw new RuntimeException("네이버 Access Token 획득 실패");
     }
     public NaverUserInfoResponseDto getNaverUserInfo(String NaverAccessToken) {
-        log.info(" 네이버 유저 정보 요청 AccessToken = {}", NaverAccessToken);
+        log.debug(" 네이버 유저 정보 요청 AccessToken = {}", NaverAccessToken);
 
         //헤더 설정 (토큰 추가)
         HttpHeaders headers = new HttpHeaders();
@@ -87,11 +87,11 @@ public class NaverLoginService {
                 entity,
                 NaverUserInfoResponseDto.class
         );
-        log.info("네이버 유저 정보 RAW 응답 = {}", response);
+        log.debug("네이버 유저 정보 RAW 응답 = {}", response);
 
 
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-            log.info(" 네이버 유저 정보 획득 성공: email = {}", response.getBody().getResponse().getEmail());
+            log.debug(" 네이버 유저 정보 획득 성공: email = {}", response.getBody().getResponse().getEmail());
 
             return response.getBody();
         }

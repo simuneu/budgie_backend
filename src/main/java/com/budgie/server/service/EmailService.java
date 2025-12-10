@@ -3,7 +3,6 @@ package com.budgie.server.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,8 +25,8 @@ public class EmailService {
 
     //메일로 인증번호 보내기
     private MimeMessage createMessage(String to, String number) throws MessagingException {
-        log.info("보내는 대상 : " + to);
-        log.info("인증 번호 : " + number);
+        log.debug("보내는 대상 : " + to);
+        log.debug("인증 번호 : " + number);
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
@@ -115,8 +114,8 @@ public class EmailService {
 
     // 비밀번호 재설정 메일 생성
     private MimeMessage createResetMessage(String to, String code) throws MessagingException {
-        log.info("비밀번호 재설정 대상 : {}", to);
-        log.info("재설정 코드 : {}", code);
+        log.debug("비밀번호 재설정 대상 : {}", to);
+        log.debug("재설정 코드 : {}", code);
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");

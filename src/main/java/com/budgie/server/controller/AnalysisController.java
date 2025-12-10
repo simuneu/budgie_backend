@@ -5,8 +5,6 @@ import com.budgie.server.dto.MonthlyTrendDto;
 import com.budgie.server.dto.SpendingPaceResponseDto;
 import com.budgie.server.dto.WeekdayExpenseDto;
 import com.budgie.server.service.AnalysisService;
-import io.opencensus.trace.Link;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

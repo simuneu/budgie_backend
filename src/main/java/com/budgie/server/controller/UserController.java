@@ -7,7 +7,6 @@ import com.budgie.server.entity.UserEntity;
 import com.budgie.server.repository.UserRepository;
 import com.budgie.server.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

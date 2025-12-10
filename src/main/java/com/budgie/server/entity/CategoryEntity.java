@@ -1,13 +1,11 @@
 package com.budgie.server.entity;
 
-import com.budgie.server.converter.CategoryNameConverter;
 import com.budgie.server.enums.BudgetType;
 import com.budgie.server.enums.CategoryName;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 

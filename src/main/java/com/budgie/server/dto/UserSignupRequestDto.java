@@ -1,6 +1,5 @@
 package com.budgie.server.dto;
 
-import jdk.jfr.StackTrace;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

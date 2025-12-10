@@ -2,8 +2,6 @@ package com.budgie.server.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.cglib.core.Local;
-
 import java.time.LocalDateTime;
 
 @Entity
