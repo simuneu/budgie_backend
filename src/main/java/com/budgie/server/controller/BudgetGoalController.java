@@ -1,5 +1,6 @@
 package com.budgie.server.controller;
 
+import com.budgie.server.dto.ApiResponse;
 import com.budgie.server.dto.BudgetGoalDto;
 import com.budgie.server.dto.GoalRequestDto;
 import com.budgie.server.dto.GoalResponseDto;
@@ -19,42 +20,46 @@ public class BudgetGoalController {
 
     //목표 조회
     @GetMapping
-    public BudgetGoalDto getGoal(@RequestParam Integer year, @RequestParam Integer month, Principal principal){
+    public ResponseEntity<ApiResponse<BudgetGoalDto>> getGoal(@RequestParam Integer year, @RequestParam Integer month, Principal principal){
         Long userId = Long.parseLong(principal.getName());
 
         BudgetGoalEntity goal = budgetGoalService.getGoal(userId, year, month);
 
         if(goal == null){
-            return null;
+            return ResponseEntity.ok(ApiResponse.ok(null));
         }
 
-        return BudgetGoalDto.builder()
+        BudgetGoalDto dto = BudgetGoalDto.builder()
                 .year(goal.getYear())
                 .month(goal.getMonth())
                 .goalAmount(goal.getGoalAmount())
                 .build();
+
+        return ResponseEntity.ok(ApiResponse.ok(dto));
     }
 
     //목표 저장
     @PostMapping
-    public BudgetGoalDto setGoal(@RequestBody BudgetGoalDto dto, Principal principal){
+    public ResponseEntity<ApiResponse<BudgetGoalDto>> setGoal(@RequestBody BudgetGoalDto dto, Principal principal){
         Long userId = Long.parseLong(principal.getName());
         BudgetGoalEntity saved = budgetGoalService.savedGoal(userId, dto);
 
-        return BudgetGoalDto.builder()
+        BudgetGoalDto res = BudgetGoalDto.builder()
                 .year(saved.getYear())
                 .month(saved.getMonth())
                 .goalAmount(saved.getGoalAmount())
                 .build();
+        return ResponseEntity.ok(ApiResponse.ok(res));
     }
 
     //목표 수정
     @PutMapping("/{year}/{month}")
-    public ResponseEntity<?> updateGoal(Principal principal, @PathVariable int year,
+    public ResponseEntity<ApiResponse<GoalResponseDto>> updateGoal(Principal principal, @PathVariable int year,
                                         @PathVariable int month, @RequestBody GoalRequestDto request){
         Long userId = Long.parseLong(principal.getName());
 
         GoalResponseDto updated = budgetGoalService.updateGoal(userId, year, month, request);
-        return ResponseEntity.ok(updated);
+
+        return ResponseEntity.ok(ApiResponse.ok(updated));
     }
 }

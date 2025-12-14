@@ -1,11 +1,9 @@
 package com.budgie.server.controller;
 
-import com.budgie.server.dto.DailyTrendDto;
-import com.budgie.server.dto.MonthlyTrendDto;
-import com.budgie.server.dto.SpendingPaceResponseDto;
-import com.budgie.server.dto.WeekdayExpenseDto;
+import com.budgie.server.dto.*;
 import com.budgie.server.service.AnalysisService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,32 +20,45 @@ public class AnalysisController {
 
     //지출 속도
     @GetMapping("/spending-pace")
-    public SpendingPaceResponseDto getSpendingPace(@RequestParam int year, @RequestParam int month,
-                                                   Principal principal){
+    public ResponseEntity<ApiResponse<SpendingPaceResponseDto>> getSpendingPace(@RequestParam int year, @RequestParam int month,
+                                                                                Principal principal){
         Long userId = Long.parseLong(principal.getName());
-        return analysisService.getSpendingPace(userId, year,month);
+        SpendingPaceResponseDto result = analysisService.getSpendingPace(userId, year, month);
+
+        return ResponseEntity.ok(ApiResponse.ok(result));
+
     }
 
     //요일소비패턴
     @GetMapping("/weekday-pattern")
-    public List<WeekdayExpenseDto> getWeekdayPattern(@RequestParam int year, @RequestParam int month, Principal principal){
+    public ResponseEntity<ApiResponse<List<WeekdayExpenseDto>>> getWeekdayPattern(@RequestParam int year, @RequestParam int month, Principal principal){
         Long userId = Long.parseLong(principal.getName());
-        return analysisService.getWeekdayPattern(userId, year, month);
+        List<WeekdayExpenseDto> result =
+                analysisService.getWeekdayPattern(userId, year, month);
+
+        return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
     //날짜별 소비 경향
     @GetMapping("/daily-trend")
-    public List<DailyTrendDto> getDailyTrend(@RequestParam int year, @RequestParam int month, Principal principal){
+    public ResponseEntity<ApiResponse<List<DailyTrendDto>>> getDailyTrend(@RequestParam int year, @RequestParam int month, Principal principal){
         Long userId = Long.parseLong(principal.getName());
-        return analysisService.getDailyTrend(userId, year, month);
+
+        List<DailyTrendDto> result =
+                analysisService.getDailyTrend(userId, year, month);
+
+        return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
     //월별 소비 추세
     @GetMapping("/monthly-trend")
-    public List<MonthlyTrendDto> getMonthlyTrend( @RequestParam int year,@RequestParam int month,
+    public ResponseEntity<ApiResponse<List<MonthlyTrendDto>>> getMonthlyTrend( @RequestParam int year,@RequestParam int month,
                                                   @RequestParam(required = false, defaultValue = "3")int count,
                                                   Principal principal){
         Long userId = Long.parseLong(principal.getName());
-        return analysisService.getMonthlyTrend(userId, year, month, count);
+        List<MonthlyTrendDto> result =
+                analysisService.getMonthlyTrend(userId, year, month, count);
+
+        return ResponseEntity.ok(ApiResponse.ok(result));
     }
 }

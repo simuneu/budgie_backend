@@ -1,5 +1,6 @@
 package com.budgie.server.controller;
 
+import com.budgie.server.dto.ApiResponse;
 import com.budgie.server.entity.AlertEntity;
 import com.budgie.server.repository.AlertRepository;
 import com.budgie.server.service.AlertService;
@@ -19,16 +20,16 @@ public class AlertController {
 
     //알림 리스트 조회
     @GetMapping
-    public ResponseEntity<List<AlertEntity>> getAlert(Principal principal){
+    public ResponseEntity<ApiResponse<List<AlertEntity>>> getAlert(Principal principal){
         Long userId = Long.parseLong(principal.getName());
 
         List<AlertEntity> alerts = alertRepository.findByUserIdOrderByCreatedAtDesc(userId);
-        return ResponseEntity.ok(alerts);
+        return ResponseEntity.ok(ApiResponse.ok(alerts));
     }
 
     //단일 알림 읽음처리
     @PostMapping("{id}/read")
-    public ResponseEntity<Void> readAlert(@PathVariable Long id, Principal principal){
+    public ResponseEntity<ApiResponse<Void>> readAlert(@PathVariable Long id, Principal principal){
         Long userId = Long.parseLong(principal.getName());
 
         AlertEntity alert = alertRepository.findById(id)
@@ -40,30 +41,32 @@ public class AlertController {
         alert.setRead(true);
         alertRepository.save(alert);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.okMessage("읽음 처리 완료"));
     }
 
     //전체 읽음 처리
     @PutMapping("/read-all")
-    public ResponseEntity<?> markAllAsRead(Principal principal){
+    public ResponseEntity<ApiResponse<Void>> markAllAsRead(Principal principal){
         Long userId = Long.parseLong(principal.getName());
         alertService.markAllAsRead(userId);
 
-        return ResponseEntity.ok("읽음 처리 완료");
+        return ResponseEntity.ok(ApiResponse.okMessage("전체 읽음 처리 완료"));
     }
 
     @GetMapping("/unread-count")
-    public ResponseEntity<?> getUnreadCount(Principal principal){
+    public ResponseEntity<ApiResponse<Long>> getUnreadCount(Principal principal){
         Long userId = Long.parseLong(principal.getName());
-        return ResponseEntity.ok(alertService.getUnreadCount(userId));
+        Long count = (long) alertService.getUnreadCount(userId);
+
+        return ResponseEntity.ok(ApiResponse.ok(count));
     }
 
     //알림 지우기
     @DeleteMapping("/{alertId}")
-    public ResponseEntity<?> deleteAlert(@PathVariable Long alertId, Principal principal){
+    public ResponseEntity<ApiResponse<Void>> deleteAlert(@PathVariable Long alertId, Principal principal){
         Long userId = Long.parseLong(principal.getName());
         alertService.deleteAlert(userId,alertId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.okMessage("삭제 완료"));
     }
 }
 

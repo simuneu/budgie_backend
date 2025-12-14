@@ -1,5 +1,6 @@
 package com.budgie.server.controller;
 
+import com.budgie.server.dto.ApiResponse;
 import com.budgie.server.dto.RecordedDayDto;
 import com.budgie.server.dto.TransactionDto;
 import com.budgie.server.entity.CategoryEntity;
@@ -26,29 +27,33 @@ public class TransactionController {
     private final CategoryRepository categoryRepository;
 
     //월별. 일별, 전체 조회
-    // --http://localhost:8080/api/transactions?year=2025&month=11
-    // transactions?year=2025&month=1&day=14
+
     @GetMapping
-    public List<TransactionDto> getTransaction(
+    public ResponseEntity<ApiResponse<List<TransactionDto>>> getTransaction(
             @RequestParam(required = false) Integer year,
             @RequestParam(required = false) Integer month,
             @RequestParam(required = false) Integer day,
             Principal principal){
+
         UserEntity user = new UserEntity();
         user.setUserId(Long.parseLong(principal.getName()));
 
+        List<TransactionDto> result;
+
         if(year != null && month != null && day != null){
-            return transactionService.getTransactionByDay(user, year,month, day);
+            result = transactionService.getTransactionByDay(user, year, month, day);
         } else if (year != null && month != null) {
-            return transactionService.getTransactionsByMonth(user, year, month);
+            result = transactionService.getTransactionsByMonth(user, year, month);
         }else {
-            return transactionService.getTransactions(user);
+            result = transactionService.getTransactions(user);
         }
+        return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
     //등록
     @PostMapping
-    public TransactionDto createTransaction(@RequestBody TransactionDto dto, Principal principal){
+    public ResponseEntity<ApiResponse<TransactionDto>> createTransaction(@RequestBody TransactionDto dto, Principal principal){
+
         UserEntity user = new UserEntity();
         user.setUserId(Long.parseLong(principal.getName()));
 
@@ -57,16 +62,19 @@ public class TransactionController {
 
         CategoryEntity category = categoryRepository.findById(dto.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("카테고리를 찾을 수 없습니다."));
+
         entity.setCategory(category);
         entity.setBudgetType(category.getBudgetType());
 
-        return transactionService.createTransaction(entity);
+        TransactionDto result = transactionService.createTransaction(entity);
+
+        return ResponseEntity.ok(ApiResponse.ok(result));
 
     }
 
     //수정
     @PutMapping("/{transactionId}")
-    public TransactionDto updateTransaction(
+    public ResponseEntity<ApiResponse<TransactionDto>> updateTransaction(
             @PathVariable Long transactionId,
             @RequestBody TransactionDto dto
     ){
@@ -77,54 +85,61 @@ public class TransactionController {
 
         updated.setCategory(category);
 
-        return transactionService.updateTransaction(transactionId, updated);
+        TransactionDto result =
+                transactionService.updateTransaction(transactionId, updated);
+
+        return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
     //삭제
     @DeleteMapping("{transactionId}")
-    public void deleteTransaction(@PathVariable Long transactionId){
+    public ResponseEntity<ApiResponse<Void>> deleteTransaction(@PathVariable Long transactionId){
         transactionService.deletedTransaction(transactionId);
+
+        return ResponseEntity.ok(ApiResponse.okMessage("삭제 완료"));
     }
 
     //월 소비 합계
     @GetMapping("/summary")
-    public Map<String, Long> getMonthlySummary(@RequestParam Integer year, Integer month, Principal principal){
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getMonthlySummary(@RequestParam Integer year, Integer month, Principal principal){
         Long userId = Long.parseLong(principal.getName());
         Long totalExpense = transactionService.getMonthlyExpense(userId, year, month);
 
-        return Map.of("totalExpense", totalExpense);
+        return ResponseEntity.ok(
+                ApiResponse.ok(Map.of("totalExpense", totalExpense))
+        );
     }
 
     //월 카테고리 합계 - 지출
     @GetMapping("/summary/category")
-    public ResponseEntity<?> getCategorySummary(@RequestParam int year, @RequestParam int month, @AuthenticationPrincipal UserDetails user){
+    public ResponseEntity<ApiResponse<?>> getCategorySummary(@RequestParam int year, @RequestParam int month, @AuthenticationPrincipal UserDetails user){
 
         Long userId = Long.parseLong(user.getUsername());
 
         return ResponseEntity.ok(
-                transactionService.getMonthlyCategorySummary(userId, year, month)
+                ApiResponse.ok(transactionService.getMonthlyCategorySummary(userId, year, month))
         );
     }
 
     //월 카테고리 합계 - 수입
     @GetMapping("/summary/category/income")
-    public ResponseEntity<?> getIncomeCategorySummary(@RequestParam int year, @RequestParam int month, @AuthenticationPrincipal UserDetails user){
+    public ResponseEntity<ApiResponse<?>> getIncomeCategorySummary(@RequestParam int year, @RequestParam int month, @AuthenticationPrincipal UserDetails user){
         Long userId = Long.parseLong(user.getUsername());
 
         return ResponseEntity.ok(
-                transactionService.getMonthlyIncomeSummary(userId, year, month)
+                ApiResponse.ok(transactionService.getMonthlyIncomeSummary(userId, year, month))
         );
     }
 
     //기록 일 조회
     @GetMapping("/days")
-    public ResponseEntity<List<RecordedDayDto>> getRecordedDays(@RequestParam int year, @RequestParam int month,
+    public ResponseEntity<ApiResponse<List<RecordedDayDto>>> getRecordedDays(@RequestParam int year, @RequestParam int month,
                                                                 @AuthenticationPrincipal UserDetails user){
         Long userId = Long.parseLong(user.getUsername());
 
         List<RecordedDayDto> result = transactionService.getRecordedDays(year, month, userId);
 
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
 

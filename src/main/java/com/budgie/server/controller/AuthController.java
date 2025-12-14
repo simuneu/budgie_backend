@@ -64,10 +64,13 @@ public class AuthController {
 
         try{
             UserEntity savedUser = authService.signup(requestDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(ApiResponse.ok(savedUser));
         }catch (RuntimeException e){
-            log.error("회원 가입 실패:{}", e.getMessage());
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity
+                    .badRequest()
+                    .body(ApiResponse.okMessage(e.getMessage()));
         }
     }
 
@@ -90,10 +93,9 @@ public class AuthController {
                     "grantType", responseDto.getGrantType()
             ));
         }catch (Exception e){
-            ResponseDto responseDto = ResponseDto.builder()
-                    .error(e.getMessage())
-                    .build();
-            return ResponseEntity.status(401).body(responseDto);
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.okMessage(e.getMessage()));
         }
     }
 
@@ -176,7 +178,9 @@ public class AuthController {
                                                 HttpServletResponse response){
 
         if(refreshToken == null || refreshToken.isBlank()){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("refreshToken이 없습니다.");
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.okMessage("refreshToken이 없습니다."));
         }
 
         try{
@@ -197,7 +201,9 @@ public class AuthController {
                     "grantType", newToken.getGrantType()
             ));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.okMessage(e.getMessage()));
         }
     }
 
@@ -206,21 +212,21 @@ public class AuthController {
     public ResponseEntity<?> logout(Principal principal) {
         Long userId = Long.parseLong(principal.getName());
         authService.logout(userId);
-        return ResponseEntity.ok("logout success");
+        return ResponseEntity.ok(ApiResponse.okMessage("logout success"));
     }
 
     //비밀번호 재설정(임시비번)
     @PostMapping("/password/reset-request")
     public ResponseEntity<?> requestPasswordReset(@RequestBody  EmailRequestDto dto){
         authService.setPasswordResetCode(dto.getEmail());
-        return ResponseEntity.ok("리셋 코드 전송 완료");
+        return ResponseEntity.ok(ApiResponse.okMessage("리셋 코드 전송 완료"));
     }
 
     //비밀번호 재설정 완료
     @PostMapping("/password/reset")
     public ResponseEntity<?> resetPassword(@RequestBody  PasswordResetRequestDto dto){
         authService.resetPassword(dto);
-        return ResponseEntity.ok("비번 재설정 완료");
+        return ResponseEntity.ok(ApiResponse.okMessage("비번 재설정 완료"));
     }
 
     //탈퇴
@@ -229,7 +235,7 @@ public class AuthController {
         Long userId = Long.parseLong(principal.getName());
         authService.deleteAccount(userId, dto.getPassword());
 
-        return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+        return ResponseEntity.ok(ApiResponse.okMessage("회원 탈퇴가 완료되었습니다."));
     }
 
     //탈퇴 검증
@@ -239,8 +245,10 @@ public class AuthController {
 
         boolean matches = authService.checkPassword(userId, dto.getPassword());
         if(!matches){
-            return ResponseEntity.status(400).body("비밀번호가 일치하지 않습니다.");
+            return ResponseEntity
+                    .badRequest()
+                    .body(ApiResponse.okMessage("비밀번호가 일치하지 않습니다."));
         }
-        return ResponseEntity.ok("탈퇴 고!");
+        return ResponseEntity.ok(ApiResponse.okMessage("탈퇴 고!"));
     }
 }
