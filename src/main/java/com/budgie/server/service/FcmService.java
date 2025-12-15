@@ -23,6 +23,13 @@ public class FcmService {
         user.setFcmToken(token);
         userRepository.save(user);
     }
+    //유저 기반 전송
+    public void sendToUser(Long userId, String title, String body){
+        userRepository.findById(userId)
+                .map(UserEntity::getFcmToken)
+                .filter(token -> token !=null && !token.isBlank())
+                .ifPresent(token -> send(token, title, body));
+    }
 
     public void send(String token, String title, String body){
         Message message = Message.builder()
@@ -38,4 +45,5 @@ public class FcmService {
             log.error("fcm error:{}", e.getMessage() ,e);
         }
     }
+
 }

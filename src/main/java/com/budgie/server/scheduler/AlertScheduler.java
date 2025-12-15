@@ -4,6 +4,7 @@ import com.budgie.server.dto.SpendingPaceResponseDto;
 import com.budgie.server.entity.UserEntity;
 import com.budgie.server.enums.AlertType;
 import com.budgie.server.repository.UserRepository;
+import com.budgie.server.service.AlertDispatchService;
 import com.budgie.server.service.AlertService;
 import com.budgie.server.service.AnalysisService;
 import com.budgie.server.service.FcmService;
@@ -21,11 +22,11 @@ import java.util.List;
 public class AlertScheduler {
     private final AnalysisService analysisService;
     private final AlertService alertService;
-    private final FcmService fcmService;
+    private final AlertDispatchService alertDispatchService;
     private  final UserRepository userRepository;
 
 
-    @Scheduled(cron = "0 0 9,12,14,18,22 * * *")
+    @Scheduled(cron = "0 0 9,14,21 * * *")
 //    @Scheduled(cron = "0 0 9 * * *") //초 분 시 일 월 요일 - 9시
     public void runDailyAlertCheck() {
         log.debug("AlertScheduler : 매일 체크를 시작");
@@ -51,17 +52,15 @@ public class AlertScheduler {
 
             //위헙도 알림
             if ("HIGH".equals(pace.getDangerLevel())) {
-                String message = "이번 달 지출 속도가 너무 빨라요!\n예산을 초과하기 일보직전이에요!!";
 
-                alertService.createAlert(userId, AlertType.BUDGET_DANGER, message);
-
-                if (user.getFcmToken() != null) {
-                    fcmService.send(
-                            user.getFcmToken(),
-                            "\uD83D\uDD25예산 초과 위험 !!\uD83D\uDD25",
-                            message
-                    );
+                if (alertService.existsMonthlyAlert(userId, AlertType.BUDGET_DANGER)) {
+                    continue;
                 }
+
+                String message = "\uD83D\uDD25 이번 달 지출 속도가 너무 빨라요!\n예산을 초과하기 일보직전이에요!!";
+
+                alertDispatchService.dispatchAlert(userId, AlertType.BUDGET_DANGER, message);
+
                 log.debug("user {}: 예산 초과 위험 알림 전송", userId);
             }
         }//for
