@@ -6,6 +6,7 @@ import com.budgie.server.repository.AlertRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -71,5 +72,13 @@ public class AlertService {
             throw new RuntimeException("삭제 권한 없음");
         }
         alertRepository.delete(alert);
+    }
+
+    @Transactional
+    public int deleteAlertsOlderThanDays(int days){
+        LocalDateTime threshold = LocalDateTime.now().minusDays(days);
+        int deletedCount = alertRepository.deleteOldAlerts(threshold);
+
+        return deletedCount;
     }
 }

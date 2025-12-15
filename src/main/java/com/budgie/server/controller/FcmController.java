@@ -1,7 +1,6 @@
 package com.budgie.server.controller;
 
 import com.budgie.server.dto.ApiResponse;
-import com.budgie.server.entity.UserEntity;
 import com.budgie.server.repository.UserRepository;
 import com.budgie.server.service.FcmService;
 import lombok.RequiredArgsConstructor;

@@ -7,7 +7,6 @@ import com.budgie.server.repository.UserRepository;
 import com.budgie.server.service.AlertDispatchService;
 import com.budgie.server.service.AlertService;
 import com.budgie.server.service.AnalysisService;
-import com.budgie.server.service.FcmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
