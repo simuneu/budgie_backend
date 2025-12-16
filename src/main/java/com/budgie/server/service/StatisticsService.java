@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,15 +24,23 @@ public class StatisticsService {
 
     //요일별 조회
     public List<WeeklyExpenseDto> getWeeklyExpense(Long userId, int year, int month){
-        List<Object[]> rows = transactionRepository.getWeeklyExpense(userId, year, month);
+        List<Object[]> rows = transactionRepository.getWeekdayExpense(userId, year, month);
 
-        return rows.stream().map(r -> new WeeklyExpenseDto(
-                        ((Number) r[0]).intValue(),
-                        (r[1] instanceof BigDecimal)
-                                ? (BigDecimal) r[1]
-                                : BigDecimal.valueOf(((Number) r[1]).longValue())
-                ))
-                .toList();
+        List<WeeklyExpenseDto> result = new ArrayList<>();
+
+        for (Object[] r : rows) {
+            int weekday0to6 = ((Number) r[0]).intValue();
+            int weekday = weekday0to6 + 1;
+
+            BigDecimal totalAmount =
+                    (r[1] instanceof BigDecimal)
+                            ? (BigDecimal) r[1]
+                            : BigDecimal.valueOf(((Number) r[1]).longValue());
+
+            result.add(new WeeklyExpenseDto(weekday, totalAmount));
+        }
+
+        return result;
     }
 
     //카테고리 탑3

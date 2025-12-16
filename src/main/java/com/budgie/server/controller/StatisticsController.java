@@ -30,8 +30,8 @@ public class StatisticsController {
 
     //요일별 합계
     @GetMapping("/{year}/{month}/weekday")
-    public ResponseEntity<ApiResponse<List<WeeklyExpenseDto>>> geyWeeklyExpense(@PathVariable int year, @PathVariable int month,
-                                                                   Principal principal){
+    public ResponseEntity<ApiResponse<List<WeeklyExpenseDto>>> geyWeeklyExpense(
+            @PathVariable int year, @PathVariable int month,Principal principal){
         Long userId = Long.parseLong(principal.getName());
         List<WeeklyExpenseDto> result = statisticsService.getWeeklyExpense(userId, year, month);
 

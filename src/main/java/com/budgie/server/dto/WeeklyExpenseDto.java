@@ -10,6 +10,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class WeeklyExpenseDto {
-    private int weekly;
+    private int weekday;
     private BigDecimal totalAmount;
 }
