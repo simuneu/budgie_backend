@@ -100,17 +100,17 @@ public class AnalysisService {
     //요일별 소비패턴
     public List<WeekdayExpenseDto> getWeekdayPattern(Long userId, int year, int month){
         List<Object[]> results = transactionRepository.getWeekdayExpense(userId, year, month);
-
         List<WeekdayExpenseDto> response = new ArrayList<>();
 
         for(Object[]row: results) {
-            int weekday = ((Number)row[0]).intValue();
+            int weekday0to6 = ((Number) row[0]).intValue();
+            int weekly = weekday0to6 + 1;
 
             BigDecimal totalAmount = (row[1] !=null)
                     ?(BigDecimal) row[1]
                     :BigDecimal.ZERO;
 
-            response.add(new WeekdayExpenseDto(convertWeekday(weekday), totalAmount));
+            response.add(new WeekdayExpenseDto(weekly, totalAmount));
         }
         return response;
     }

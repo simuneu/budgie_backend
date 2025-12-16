@@ -8,6 +8,6 @@ import java.math.BigDecimal;
 @Getter
 @AllArgsConstructor
 public class WeekdayExpenseDto {
-    private String weekday;
+    private int weekday;
     private BigDecimal totalAmount;
 }
