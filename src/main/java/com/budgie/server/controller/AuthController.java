@@ -84,6 +84,7 @@ public class AuthController {
                     .secure(true)
                     .sameSite("None")
                     .path("/")
+                    .domain(".budgie.fit")
                     .maxAge(jwtProvider.getRefreshTokenExpirationSeconds())
                     .build();
             response.addHeader("Set-Cookie", refreshCookie.toString());
@@ -191,6 +192,7 @@ public class AuthController {
                     .secure(true)
                     .sameSite("None")
                     .path("/")
+                    .domain(".budgie.fit")
                     .maxAge(jwtProvider.getRefreshTokenExpirationSeconds())
                     .build();
 

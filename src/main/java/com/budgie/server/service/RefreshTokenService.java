@@ -46,6 +46,10 @@ public class RefreshTokenService {
 
     //삭제
     public boolean deletedRefreshToken(Long userId) {
+        String redisKey = "refresh_token:" + userId;
+
+        redisTemplate.delete(redisKey);
+
         if (refreshTokenRepository.existsById(userId)) {
             refreshTokenRepository.deleteById(userId);
             log.debug("로그아웃 성공, refresh token 삭제 완료. userId:{}", userId);
